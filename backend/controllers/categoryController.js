@@ -20,7 +20,6 @@ const createCategory = async (req, res) => {
   }
 };
 
-// Function to get all categories
 const getAllCategories = async (req, res) => {
   try {
     

@@ -1,7 +1,7 @@
-
 const { QueryTypes } = require('sequelize');
+const {sequelize} = require('../config/database');
 
-// Function to create a new product
+
 const createProduct = async (req, res) => {
   try {
     const { name, description, categoryId, price, images } = req.body;
