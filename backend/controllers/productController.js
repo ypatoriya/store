@@ -1,11 +1,11 @@
 const { QueryTypes } = require('sequelize');
-const {sequelize} = require('../config/database');
+const { sequelize } = require('../config/database');
 
 
 const createProduct = async (req, res) => {
   try {
     const { name, description, categoryId, price, images } = req.body;
- 
+
     const result = await sequelize.query(
       'INSERT INTO product (name, description, categoryId, price, images) VALUES (?, ?, ?, ?, ?)',
       {
@@ -58,7 +58,7 @@ const updateProduct = async (req, res) => {
   try {
     const productId = req.params.id;
     const { name, description, categoryId, price, images } = req.body;
-    
+
     await sequelize.query(
       'UPDATE product SET name = ?, description = ?, categoryId = ?, price = ?, images = ? WHERE id = ?',
       { replacements: [name, description, categoryId, price, images, productId], type: QueryTypes.UPDATE }
@@ -74,7 +74,7 @@ const updateProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
   try {
     const productId = req.params.id;
-    
+
     await sequelize.query(
       'DELETE FROM product WHERE id = ?',
       { replacements: [productId], type: QueryTypes.DELETE }
@@ -86,4 +86,34 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-module.exports = { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct };
+
+const searchProducts = async (req, res) => {
+  try {
+    const { name } = req.query;
+    console.log(name);
+    if (!name) {
+      return res.status(400).json({ error: 'Search query is required' });
+    }
+
+    const products = await sequelize.query(
+      `SELECT p.*, c.categoryName AS categoryName
+       FROM product p
+       LEFT JOIN category c ON p.categoryId = c.id
+       WHERE LOWER(p.name) LIKE :query
+         OR LOWER(p.description) LIKE :query
+         OR CAST(p.categoryId AS CHAR) LIKE :query
+         OR CAST(p.price AS CHAR) LIKE :query`,
+      {
+        replacements: { query: `%${name.toLowerCase()}%` },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+module.exports = { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, searchProducts };
