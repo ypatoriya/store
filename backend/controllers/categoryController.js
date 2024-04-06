@@ -1,19 +1,20 @@
-
+const { sequelize } = require('../config/database');
 const { QueryTypes } = require('sequelize');
+
 
 // Function to create a new category
 const createCategory = async (req, res) => {
   try {
     const { categoryname, createdBy } = req.body;
     const result = await sequelize.query(
-      'INSERT INTO categories (categoryname, createdBy) VALUES (?, ?)',
+      'INSERT INTO category (categoryname, createdBy) VALUES (?, ?)',
       {
         replacements: [categoryname, createdBy],
         type: QueryTypes.INSERT
       }
     );
     // Return the ID of the newly created category
-    res.json({ id: result[0] });
+    res.json({ message: 'Category created!', id: result[0] });
   } catch (error) {
     console.error('Error creating category:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -24,7 +25,7 @@ const getAllCategories = async (req, res) => {
   try {
     
     const categories = await sequelize.query(
-      'SELECT * FROM categories',
+      'SELECT * FROM category',
       { type: QueryTypes.SELECT }
     );
     res.json(categories);

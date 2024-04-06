@@ -14,7 +14,7 @@ const createProduct = async (req, res) => {
       }
     );
 
-    res.json({ id: result[0] });
+    res.json({ message: 'Product created!', id: result[0] });
   } catch (error) {
     console.error('Error creating product:', error);
     res.status(500).json({ error: 'Internal server error' });
