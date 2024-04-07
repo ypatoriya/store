@@ -1,26 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
+import './component.css';
 
 const ProductTable = () => {
     const [products, setProducts] = useState([]);
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
 
     const handleSearch = (event) => {
-        const searchTerm = event.target.value;
-        const filteredProducts = products.filter((product) =>
-            product.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setProducts(filteredProducts);
+     navigate("/search");
     };
 
     const navigate = useNavigate();
+
+    const handleNextPage = () => {
+        setPage(page + 1);
+      };
+    
+      const handlePreviousPage = () => {
+        if (page > 1) {
+          setPage(page - 1);
+        }
+      };
+    
 
     const handleLogout = () => {
         localStorage.removeItem('accessToken');
         navigate('/')
     }
 
+    const handleClick = () => {
+        navigate('/addProduct');
+    }
+
     const handleImageClick = () => {
+
+    }
+
+    const handleDelete = () => {
 
     }
 
@@ -75,7 +93,7 @@ const ProductTable = () => {
                     </div>
                 </div>
             </nav>
-            <table className="table table-striped">
+            <table className="table">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -97,10 +115,18 @@ const ProductTable = () => {
                                     <img key={i} src={image} alt={`Product ${i}`} style={{ maxWidth: '100px' }} />
                                 ))}
                             </td>
+                            <td>{<button className="btn btn-primary btn-sm" onClick={() => navigate(`/edit/${product._id}`)}>Edit</button>}</td>
+                            <td>{<button className="btn btn-danger btn-sm" onClick={handleDelete}>Delete</button>}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+            <button className="btn btn-primary btn-sm" type="button" onClick={handleClick}>Add Product</button>
+
+            <button className="btn btn-primary btn-sm mx-5" type="button" onClick={handlePreviousPage} disabled={page === 1}>Previous Page</button>
+            <span className="mx-2">Page {page}</span>
+
+            <button className="btn btn-primary btn-sm mx-5" type="button" onClick={handleNextPage} disabled={products.length < pageSize}>Next Page</button>
         </div>
     );
 };

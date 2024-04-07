@@ -14,6 +14,6 @@ router.post('/users/login', loginUser);
 router.get('/users/profile/:id', getUserProfile);
 
 // Update user profile
-router.put('/users/profile/:id', getImage);
+router.put('/users/editProfile/:id', getImage);
 
 module.exports = router;

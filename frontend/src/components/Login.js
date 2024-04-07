@@ -32,13 +32,13 @@ const Login = () => {
         }
          
         try {
-            const response = await axios.post('http://localhost:5000/login', { email, password });
+            const response = await axios.post('http://localhost:5000/api/users/login    ', { email, password });
 
             if (response.status === 200) {
 
-                const token = response.data.token;
-                localStorage.setItem('accessToken', token);
-                navigate('/allBooks');
+                //const token = response.data.token;
+                //localStorage.setItem('accessToken', token);
+                navigate('/allProducts');
 
             } else {
                 setErrorMessage('Login failed. Please try again.');

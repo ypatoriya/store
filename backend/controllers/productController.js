@@ -24,8 +24,12 @@ const createProduct = async (req, res) => {
 // Function to get all products
 const getAllProducts = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
+    const offset = (page - 1) * pageSize;
+
     const products = await sequelize.query(
-      'SELECT * FROM product',
+      `SELECT * FROM product LIMIT ${pageSize} OFFSET ${offset}`,
       { type: QueryTypes.SELECT }
     );
     res.json(products);
@@ -34,6 +38,7 @@ const getAllProducts = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
 
 // Function to get a specific product by ID
 const getProductById = async (req, res) => {
