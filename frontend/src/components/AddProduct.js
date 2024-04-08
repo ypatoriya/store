@@ -20,7 +20,7 @@ const ProductForm = ({ onSubmit }) => {
     };
 
     const handleFileChange = (e) => {
-        setFormData({ ...formData, images: e.target.files[0] });
+        setFormData({ ...formData, images: e.target.files });
     };
 
     const handleShowAllProducts = () => {
@@ -38,6 +38,14 @@ const ProductForm = ({ onSubmit }) => {
             return;
         }
         const { name, description, categoryId, price, images } = formData;
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('description', description);
+        formData.append('categoryId', categoryId);
+        formData.append('price', price);
+        for (let i = 0; i < images.length; i++) {
+            formData.append('images', images[i]);
+        }
 
         const xhr = new XMLHttpRequest();
         xhr.open('POST', 'http://localhost:5000/api/createProducts', true);

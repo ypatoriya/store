@@ -3,12 +3,17 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
 import './component.css';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
+import axios from 'axios';
+
+
+
 
 const ProductTable = () => {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [errorMessage, setErrorMessage] = useState('');
+    const [user, setUser] = useState([])
 
     const handleSearch = (event) => {
         navigate("/search");
@@ -43,10 +48,10 @@ const ProductTable = () => {
     const handleDelete = (id) => {
 
         const token = localStorage.getItem('accessToken');
-                if (!token) {
-                    console.log('No token found. User is not authenticated.');
-                    navigate("/")
-                }
+        if (!token) {
+            console.log('No token found. User is not authenticated.');
+            navigate("/")
+        }
 
         const isConfirmed = window.confirm('Are you sure you want to delete this product?');
 
@@ -67,7 +72,7 @@ const ProductTable = () => {
                 console.error('Failed to delete product. Status:', xhr.status);
                 window.location.reload()
             }
-        }; 
+        };
         xhr.onerror = function () {
             console.error('Error deleting product. Network error');
         };
@@ -75,6 +80,8 @@ const ProductTable = () => {
     }
 
     useEffect(() => {
+
+
         const fetchProducts = async () => {
             try {
 
@@ -102,8 +109,31 @@ const ProductTable = () => {
             }
         };
 
+        const fetchUser = async () => {
+            try {
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    console.log('No token found. User is not authenticated.');
+                    return;
+                }
+
+                const headers = {
+                    'Authorization': token
+                };
+
+                const response = await axios.get(`http://localhost:5000/api/users/profile/1`, { headers });
+                setUser(response.data);
+                console.log(user.profile_pic);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+
+        fetchUser();
         fetchProducts();
     }, []);
+
+
 
     return (
         <div className="container">
@@ -115,7 +145,7 @@ const ProductTable = () => {
                         <h2>Product list</h2>
 
                     </div>
-                    
+
                     <div class="d-flex align-items-center">
                         <div class="dropdown">
 
@@ -123,10 +153,10 @@ const ProductTable = () => {
                             <button className="btn btn-warning btn-sm mx-5" type="button" onClick={handleLogout}>Log Out</button>
                             <a class="navbar-brand mt-2 mt-lg-0" href='' onClick={handleImageClick}>
                                 <img
-                                    src=""
+                                    src={user.profile_pic}
                                     height="15"
-                                    alt="user"
-                                />
+                                    width="15"
+                                    alt="user" />
                             </a>
                         </div>
                     </div>
@@ -153,9 +183,11 @@ const ProductTable = () => {
                             <td>{product.categoryId}</td>
                             <td>{product.price}</td>
                             <td>
-                                {Array.isArray(product.images) && product.images.map((image, i) => (
-                                    <img key={i} src={image} alt={`Product ${i}`} style={{ maxWidth: '100px' }} />
-                                ))}
+                                <div>
+                                    {product.images.map((imagePath, index) => (
+                                        <img key={index} src={`/uploads/${imagePath}`} alt={`Product ${index}`} />
+                                    ))}
+                                </div>
                             </td>
                             <td>{<button className="btn btn-primary btn-sm" onClick={() => navigate(`/editProduct/${product.id}`)}>Edit</button>}</td>
                             <td>{<button className="btn btn-danger btn-sm" onClick={() => handleDelete(product.id)}>Delete</button>}</td>

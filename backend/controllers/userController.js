@@ -3,6 +3,8 @@ const { sequelize } = require('../config/database');
 const { QueryTypes } = require('sequelize');
 const jwt = require('jsonwebtoken');
 const verifyToken = require('../config/auth')
+const fs = require('fs');
+const path = require('path');
 
 const generateToken = (user) => {
   const payload = { email: user.email, password: user.password };
@@ -86,6 +88,44 @@ const getUserProfile = async (req, res) => {
 
 
 const getImage = async (req, res) => {
+  try {
+      console.log(req.files)
+      let id = req.params.id  
+      let image = req.files.profile_pic //key and auth
+
+
+      // if(image.length>1){
+      //     throw new error('multiple file not allowed!')
+      // }
+ 
+      const dirExists = fs.existsSync(`public/assets/`);
+      
+      if (!dirExists) {
+          fs.mkdirSync(`public/assets/`, { recursive: true });
+      }
+
+      if (image == undefined || image == null) throw new Error("file not found!");
+
+     // let savePath = `/public/assets/${Date.now()}.${image.name.split(".").pop()}`
+     
+     let savePath = `/public/assets/${Date.now()}.${image.name.split(".").pop()}`
+      image.mv(path.join(__dirname, ".." + savePath), async (err) => {
+          if (err) throw new Error("error in uploading")
+
+          else {
+            const updateQuery = 'UPDATE users SET profile_pic = :profile_pic WHERE id = :id';
+
+            await sequelize.query(updateQuery, {
+              replacements: { profile_pic: savePath, id: id },
+              type: sequelize.QueryTypes.UPDATE
+            });
+          }
+      });
+       
+  } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: 'error in file upload api!' });
+  }
 }
 
 module.exports = {

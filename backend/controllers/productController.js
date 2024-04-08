@@ -2,18 +2,28 @@ const { QueryTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 
-
+//create product
 const createProduct = async (req, res) => {
   try {
-    const { name, description, categoryId, price, images } = req.body;
+    const { name, description, categoryId, price } = req.body;
+    const images = req.files ? Object.values(req.files) : [];
 
     const result = await sequelize.query(
-      'INSERT INTO product (name, description, categoryId, price, images) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO product (name, description, categoryId, price, images) VALUES (?, ?, ?, ?)',
       {
-        replacements: [name, description, categoryId, price, images],
+        replacements: [name, description, categoryId, price],
         type: QueryTypes.INSERT
       }
     );
+
+    const productId = result[0];
+
+    for (const image of images) {
+      await sequelize.query(
+          'INSERT INTO product_images (product_id, image_path) VALUES (?, ?)',
+          { replacements: [productId, image.name], type: QueryTypes.INSERT }
+      );
+  }
 
     res.json({ message: 'Product created!', id: result[0] });
   } catch (error) {
@@ -22,7 +32,7 @@ const createProduct = async (req, res) => {
   }
 };
 
-// Function to get all products
+// all products
 const getAllProducts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -30,7 +40,16 @@ const getAllProducts = async (req, res) => {
     const offset = (page - 1) * pageSize;
 
     const products = await sequelize.query(
-      `SELECT * FROM product LIMIT ${pageSize} OFFSET ${offset}`,
+      `SELECT
+        p.id,
+        p.name,
+        p.description,
+        p.categoryId,
+        p.price,
+        (SELECT pi.image_path
+         FROM product_images pi
+         WHERE pi.product_id = p.id) AS images
+      FROM product p`,
       { type: QueryTypes.SELECT }
     );
     res.json(products);
@@ -40,8 +59,7 @@ const getAllProducts = async (req, res) => {
   }
 };
 
-
-// Function to get a specific product by ID
+// get a specific product by ID
 const getProductById = async (req, res) => {
   try {
     const productId = req.params.id;
@@ -60,7 +78,7 @@ const getProductById = async (req, res) => {
   }
 };
 
-// Function to update a product
+// update a product
 const updateProduct = async (req, res) => {
   try {
     const productId = req.params.id;
@@ -68,7 +86,7 @@ const updateProduct = async (req, res) => {
 
     await sequelize.query(
       'UPDATE product SET name = ?, description = ?, categoryId = ?, price = ?, images = ? WHERE id = ?',
-      { replacements: [name, description, categoryId, price, images, productId], type: QueryTypes.UPDATE }
+      { replacements: [name, description, categoryId, price, images, productId]}
     );
     res.json({ message: 'Product updated successfully' });
   } catch (error) {
@@ -77,7 +95,7 @@ const updateProduct = async (req, res) => {
   }
 };
 
-// Function to delete a product
+// delete a product
 const deleteProduct = async (req, res) => {
   try {
     const productId = req.params.id;
@@ -93,7 +111,7 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-
+//search
 const searchProducts = async (req, res) => {
   try {
     const { name } = req.query;

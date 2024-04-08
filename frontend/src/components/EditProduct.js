@@ -8,9 +8,6 @@ const UpdateBook = () => {
   const [product, setProduct] = useState({});
   const [errorMessage, setErrorMessage] = useState('');
 
-  console.log(id)
-
-
   useEffect(() => {
     const fetchProductData = async () => {
 
@@ -44,7 +41,7 @@ const UpdateBook = () => {
     };
 
     fetchProductData();
-  }, []);
+  },[]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,7 +49,7 @@ const UpdateBook = () => {
   };
 
   const handleShowAllBook = () => {
-    navigate('/allBooks');
+    navigate('/allProducts');
   };
 
   const handleSubmit = async (e) => {
@@ -62,7 +59,7 @@ const UpdateBook = () => {
       return;
     }
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/updateProduct/${id}`, {
         method: 'PUT',
         headers: {
           'Authorization': localStorage.getItem('accessToken'),
@@ -109,11 +106,11 @@ const UpdateBook = () => {
             <input type="text" className="form-control" id="description" name="description" value={product.description} onChange={handleChange} />
           </div>
           <div className="mb-3">
-            <label htmlFor="categoryId" className="form-label">Published Year</label>
+            <label htmlFor="categoryId" className="form-label">Category ID</label>
             <input type="text" className="form-control" id="categoryId" name="categoryId" value={product.categoryId} onChange={handleChange} />
           </div>
           <div className="mb-3">
-            <label htmlFor="price" className="form-label">Quantity Available</label>
+            <label htmlFor="price" className="form-label">Price</label>
             <input type="text" className="form-control" id="price" name="price" value={product.price} onChange={handleChange} />
           </div>
         
@@ -121,7 +118,7 @@ const UpdateBook = () => {
             <label htmlFor="image" className="form-label">Image</label>
             <input type="file" className="form-control" id="image" name="image" value={product.image} onChange={handleChange} />
           </div>
-          <button type="submit" className="btn btn-primary">Update Book</button>
+          <button type="submit" className="btn btn-primary">Update Product</button>
           <button type="submit" className="btn btn-primary mx-5"onClick={handleShowAllBook}>Show All Books</button>
         </form>
       </div>

@@ -14,7 +14,7 @@ const Search = () => {
     }
 
     const handleLogout = () => {
-        //localStorage.removeItem('accessToken');
+        localStorage.removeItem('accessToken');
         navigate('/');
     }
 
