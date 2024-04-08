@@ -2,6 +2,12 @@ const bcrypt = require('bcrypt');
 const { sequelize } = require('../config/database');
 const { QueryTypes } = require('sequelize');
 const jwt = require('jsonwebtoken');
+const verifyToken = require('../config/auth')
+
+const generateToken = (user) => {
+  const payload = { email: user.email, password: user.password };
+  return jwt.sign(payload, 'crud', { expiresIn: '24h' });
+};
 
 // Function to register a new user
 const registerUser = async (req, res) => {
@@ -10,7 +16,7 @@ const registerUser = async (req, res) => {
     const { firstName, lastName, email, password, gender, hobbies, userRole, profile_pic } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    
+
     const result = await sequelize.query(
       'INSERT INTO users (firstName, lastName, email, password, gender, hobbies, userRole, profile_pic) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
       {
@@ -29,39 +35,44 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
- 
-    const [existingUser] = await sequelize.query(
-      'SELECT * FROM users WHERE email = ?', { replacements: [email], type: QueryTypes.SELECT }
-    );  
+
+    const [existingUser] = await sequelize.query('SELECT * FROM users WHERE email = ?',
+      { replacements: [email], type: QueryTypes.SELECT });
 
     if (existingUser) {
-      const passwordMatch = await bcrypt.compare(password, existingUser.password);
+      const user = existingUser;
+      console.log(user);
 
-            if (passwordMatch) {
-                //const token = generateToken(user);
-                //return res.status(200).send({ message: 'Login success!', token: token });
-                return res.status(200).send({ message: 'Login success!' });
-            } else {
-                return res.status(401).send({ message: 'Incorrect password!' });
-            };
-        } else {
-            return res.status(404).send({ message: 'Email not found! Sign up!' });
-        }
+      const passwordMatch = await bcrypt.compare(password, user.password);
+
+      if (passwordMatch) {
+        const token = generateToken(user);
+        return res.status(200).send({ message: 'Login success!', token: token });
+      } else {
+        return res.status(401).send({ message: 'Incorrect password!' });
+      }
+    } else {
+      return res.status(404).send({ message: 'Email not found! Sign up!' });
+    }
   } catch (error) {
-    console.error('Error logging in user:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.log(error);
+    res.status(500).send({
+      message: 'Error in login check api!',
+      error
+    });
   }
 };
 
 // Function to get user profile
 const getUserProfile = async (req, res) => {
   try {
-    const userId = req.params.id; 
-    console.log(`userId: ${userId}`); 
+    const userId = req.params.id;
+    console.log(`userId: ${userId}`);
     const user = await sequelize.query(
-      'SELECT * FROM users WHERE id = ?',  { 
+      'SELECT * FROM users WHERE id = ?', {
       replacements: [userId],
-      type: sequelize.QueryTypes.SELECT})
+      type: sequelize.QueryTypes.SELECT
+    })
 
     if (user.length === 0) {
       return res.status(404).json({ error: 'User not found' });

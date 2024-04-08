@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import '../App.css'
+import './component.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -72,7 +72,7 @@ const Search = () => {
                     <div className="input-group mb-4">
                         <input
                             type="text"
-                            className="form-control form-control-md"
+                            className="form-control search-input form-control-md"
                             style={{ width: '150px' }}
                             placeholder="Search..."
                             value={query}

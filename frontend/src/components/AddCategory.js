@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; 
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
@@ -51,7 +51,7 @@ const ProductForm = ({ onSubmit }) => {
         };
         xhr.send(
             JSON.stringify({
-                name,
+                categoryname: name,
                 createdBy
             })
         );
@@ -70,8 +70,8 @@ const ProductForm = ({ onSubmit }) => {
                             <input type="text" className="form-control" id="name" name="name" value={formData.name} onChange={handleChange} />
                         </div>
                         <div className="form-group mx-3 mt-3">
-                            <label htmlFor="description">Created By</label>
-                            <input type="text" className="form-control" id="description" name="description" value={formData.description} onChange={handleChange} />
+                            <label htmlFor="createdBy">Created By</label>
+                            <input type="text" className="form-control" id="createdBy" name="createdBy" value={formData.description} onChange={handleChange} />
                         </div>
                     </div>
                 </Col>

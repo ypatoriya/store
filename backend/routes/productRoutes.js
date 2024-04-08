@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
 const { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, searchProducts} = productController;
+const verifyToken = require('../config/auth');
 
 // Create a new product
 router.post('/createProducts', createProduct);

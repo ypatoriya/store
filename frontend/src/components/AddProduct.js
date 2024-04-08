@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import './component.css';
 
 const ProductForm = ({ onSubmit }) => {
     const [errorMessage, setErrorMessage] = useState('');
@@ -71,23 +72,23 @@ const ProductForm = ({ onSubmit }) => {
                 <Col md={6}>
                     {errorMessage && <div className="alert alert-danger mt-3">{errorMessage}</div>}
                     <div>
-                        <div className="form-group mx-3 mt-3">
+                        <div className="form-group mx-4 mt-3">
                             <label htmlFor="name">Name</label>
                             <input type="text" className="form-control" id="name" name="name" value={formData.name} onChange={handleChange} />
                         </div>
-                        <div className="form-group mx-3 mt-3">
+                        <div className="form-group mx-4 mt-3">
                             <label htmlFor="description">Description</label>
                             <input type="text" className="form-control" id="description" name="description" value={formData.description} onChange={handleChange} />
                         </div>
-                        <div className="form-group mx-3 mt-3">
+                        <div className="form-group mx-4 mt-3">
                             <label htmlFor="categoryId">Category ID</label>
                             <input type="text" className="form-control" id="categoryId" name="categoryId" value={formData.categoryId} onChange={handleChange} />
                         </div>
-                        <div className="form-group mx-3 mt-3">
+                        <div className="form-group mx-4 mt-3">
                             <label htmlFor="price">Price</label>
                             <input type="text" className="form-control" id="price" name="price" value={formData.price} onChange={handleChange} />
                         </div>
-                        <div className="form-group mx-3 mt-3">
+                        <div className="form-group mx-4 mt-3">
                             <label htmlFor="images">Images</label>
                             <div className="custom-file mx-3 mt-3">
                                 <input type="file" className="custom-file-input" id="images" name="images" onChange={handleFileChange} />
@@ -96,21 +97,22 @@ const ProductForm = ({ onSubmit }) => {
                     </div>
                 </Col>
             </Row>
-            <Row className="justify-content-between mt-3">
-                <Col>
+            <div className="addproduct-buttons mt-5">
+            <div>
                     <button className="btn btn-primary" onClick={handleShowAllProducts}>
-                        Show All Products
-                    </button>
-                </Col>
-                <Col className="text-right">
-                    <button className="btn btn-danger mr-2 mx-3" onClick={handleCancel}>
-                        Cancel
-                    </button>
-                    <button className="btn btn-primary mr-2 mx-3" onClick={handleSubmit}>
+                            Show All Products
+                        </button>
+                </div>
+                <div className='right-section'>
+                    <button className="btn btn-danger " onClick={handleCancel}>
+                            Cancel
+                        </button>
+                    <button className="btn btn-primary " onClick={handleSubmit}>
                         Submit
                     </button>
-                </Col>
-            </Row>
+                </div>
+            </div>
+           
         </Container>
 
     );
