@@ -8,6 +8,8 @@ const UpdateBook = () => {
   const [product, setProduct] = useState({});
   const [errorMessage, setErrorMessage] = useState('');
 
+  console.log(id)
+
 
   useEffect(() => {
     const fetchProductData = async () => {
@@ -28,7 +30,7 @@ const UpdateBook = () => {
         
         if (response.status === 200) {
           const data = await response.json();
-          setProduct(data.data[0]);
+          setProduct(data);
           console.log(data);
         } else if (response.status === 401) {
           console.log('Unauthorized access. Token may be invalid or expired.');
@@ -42,7 +44,7 @@ const UpdateBook = () => {
     };
 
     fetchProductData();
-  }, [id]);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

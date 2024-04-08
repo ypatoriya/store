@@ -67,7 +67,7 @@ const ProductTable = () => {
                 console.error('Failed to delete product. Status:', xhr.status);
                 window.location.reload()
             }
-        };
+        }; 
         xhr.onerror = function () {
             console.error('Error deleting product. Network error');
         };
