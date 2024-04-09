@@ -23,7 +23,7 @@ const createProduct = async (req, res) => {
       }
     );
 
-    const productId = req.params.id
+    const productId = result[0];
 
     for (const image of images) {
       await sequelize.query(
@@ -38,6 +38,7 @@ const createProduct = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
 
 // all products
 const getAllProducts = async (req, res) => {

@@ -6,17 +6,18 @@ import { Container, Form, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
 
 
-
-
 const ProductTable = () => {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [errorMessage, setErrorMessage] = useState('');
     const [user, setUser] = useState([])
+    const [query, setQuery] = useState('');
 
-    const handleSearch = (event) => {
-        navigate("/search");
+    const handleSearch = () => {
+        if (query.trim() !== '') {
+            navigate(`/search/?name=${encodeURIComponent(query)}`); // Navigate to search page with encoded query
+        }
     };
 
     const navigate = useNavigate();
@@ -133,30 +134,34 @@ const ProductTable = () => {
     }, []);
 
 
-
     return (
         <div className="container">
             <nav class="navbar navbar-expand-lg navbar-light bg-body-tertiary mt-5 mb-3">
 
                 <div class="container-fluid">
 
-                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <div class="product-navbar" id="navbarSupportedContent">
                         <h2>Product list</h2>
 
                     </div>
 
                     <div class="d-flex align-items-center">
-                        <div class="dropdown">
-
-                            <button className="btn btn-primary btn-sm mx-5" type="button" onClick={handleSearch}>Search</button>
-                            <button className="btn btn-warning btn-sm mx-5" type="button" onClick={handleLogout}>Log Out</button>
-                            <a class="navbar-brand mt-2 mt-lg-0" href='' onClick={handleImageClick}>
-                                <img
-                                    src={`http://localhost:5000/assets/${user.profile_pic}`}
-                                    height="30"
-                                    width="30"
-                                    alt="user" />
-                            </a>
+                        <div class="navbar-right">
+                            <div class="d-flex align-items-center"> <input  type="text"
+                            className="form-control"
+                            placeholder="Search..."
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)} />
+                                <button className="btn btn-primary btn-sm mx-5" type="button" onClick={handleSearch}>Search</button>
+                                <button className="btn btn-warning btn-sm mx-5" type="button" onClick={handleLogout}>Log Out</button>
+                                <a class="navbar-brand mt-2 mt-lg-0" href='' onClick={handleImageClick}>
+                                    <img
+                                        src={`http://localhost:5000/assets/${user.profile_pic}`}
+                                        height="30"
+                                        width="30"
+                                        alt="user" />
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -171,6 +176,8 @@ const ProductTable = () => {
                         <th>Category ID</th>
                         <th>Price</th>
                         <th>Images</th>
+                        <th>Action</th>
+
                     </tr>
                 </thead>
                 <tbody>

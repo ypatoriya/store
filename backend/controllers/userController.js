@@ -102,9 +102,9 @@ const getImage = async (req, res) => {
     let image = req.files.profile_pic //key and auth
 
 
-    // if(image.length>1){
-    //     throw new error('multiple file not allowed!')
-    // }
+    if(image.length>1){
+        throw new error('multiple file not allowed!')
+    }
 
     const dirExists = fs.existsSync(`public/assets/`);
 
@@ -117,6 +117,7 @@ const getImage = async (req, res) => {
     // let savePath = `/public/assets/${Date.now()}.${image.name.split(".").pop()}`
 
     let savePath = `/public/assets/${Date.now()}.${image.name.split(".").pop()}`
+    
     image.mv(path.join(__dirname, ".." + savePath), async (err) => {
       if (err) throw new Error("error in uploading")
 
