@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 
 const generateToken = (user) => {
-  const payload = { email: user.email, password: user.password };
+  const payload = { email: user.email, password: user.password, id: user.id };
   return jwt.sign(payload, 'crud', { expiresIn: '24h' });
 };
 
@@ -15,8 +15,10 @@ const generateToken = (user) => {
 const registerUser = async (req, res) => {
   try {
 
-    const { firstName, lastName, email, password, gender, hobbies, userRole, profile_pic } = req.body;
+    const { firstName, lastName, email, password, gender, hobbies, userRole } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    const profile_pic = req.file.filename;
 
 
     const result = await sequelize.query(
@@ -43,13 +45,15 @@ const loginUser = async (req, res) => {
 
     if (existingUser) {
       const user = existingUser;
-      console.log(user);
 
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (passwordMatch) {
         const token = generateToken(user);
-        return res.status(200).send({ message: 'Login success!', token: token });
+        const userId = user.id;
+        const userRole = user.userRole;
+        console.log(userRole, userId);
+        return res.status(200).send({ message: 'Login success!', token: token, userId: userId, userRole: userRole });
       } else {
         return res.status(401).send({ message: 'Incorrect password!' });
       }
@@ -89,42 +93,42 @@ const getUserProfile = async (req, res) => {
 
 const getImage = async (req, res) => {
   try {
-      console.log(req.files)
-      let id = req.params.id  
-      let image = req.files.profile_pic //key and auth
+    console.log(req.files)
+    let id = req.params.id
+    let image = req.files.profile_pic //key and auth
 
 
-      // if(image.length>1){
-      //     throw new error('multiple file not allowed!')
-      // }
- 
-      const dirExists = fs.existsSync(`public/assets/`);
-      
-      if (!dirExists) {
-          fs.mkdirSync(`public/assets/`, { recursive: true });
+    // if(image.length>1){
+    //     throw new error('multiple file not allowed!')
+    // }
+
+    const dirExists = fs.existsSync(`public/assets/`);
+
+    if (!dirExists) {
+      fs.mkdirSync(`public/assets/`, { recursive: true });
+    }
+
+    if (image == undefined || image == null) throw new Error("file not found!");
+
+    // let savePath = `/public/assets/${Date.now()}.${image.name.split(".").pop()}`
+
+    let savePath = `/public/assets/${Date.now()}.${image.name.split(".").pop()}`
+    image.mv(path.join(__dirname, ".." + savePath), async (err) => {
+      if (err) throw new Error("error in uploading")
+
+      else {
+        const updateQuery = 'UPDATE users SET profile_pic = :profile_pic WHERE id = :id';
+
+        await sequelize.query(updateQuery, {
+          replacements: { profile_pic: savePath, id: id },
+          type: sequelize.QueryTypes.UPDATE
+        });
       }
+    });
 
-      if (image == undefined || image == null) throw new Error("file not found!");
-
-     // let savePath = `/public/assets/${Date.now()}.${image.name.split(".").pop()}`
-     
-     let savePath = `/public/assets/${Date.now()}.${image.name.split(".").pop()}`
-      image.mv(path.join(__dirname, ".." + savePath), async (err) => {
-          if (err) throw new Error("error in uploading")
-
-          else {
-            const updateQuery = 'UPDATE users SET profile_pic = :profile_pic WHERE id = :id';
-
-            await sequelize.query(updateQuery, {
-              replacements: { profile_pic: savePath, id: id },
-              type: sequelize.QueryTypes.UPDATE
-            });
-          }
-      });
-       
   } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: 'error in file upload api!' });
+    console.log(error);
+    res.status(500).json({ message: 'error in file upload api!' });
   }
 }
 

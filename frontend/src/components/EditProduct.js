@@ -19,12 +19,13 @@ const UpdateBook = () => {
           navigate('/');
           return;
         }
+
         const response = await fetch(`http://localhost:5000/api/productById/${id}`, {
           headers: {
             'Authorization': token
           }
         });
-        
+
         if (response.status === 200) {
           const data = await response.json();
           setProduct(data);
@@ -41,7 +42,7 @@ const UpdateBook = () => {
     };
 
     fetchProductData();
-  },[]);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,7 +55,7 @@ const UpdateBook = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(!product.name || !product.description || !product.categoryId || !product.price || !product.image ) {
+    if (!product.name || !product.description || !product.categoryId || !product.price || !product.image) {
       setErrorMessage('All fields are required!');
       return;
     }
@@ -86,7 +87,7 @@ const UpdateBook = () => {
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="id" className="form-label">
-              ID  
+              ID
             </label>
             <input
               type="text"
@@ -113,13 +114,13 @@ const UpdateBook = () => {
             <label htmlFor="price" className="form-label">Price</label>
             <input type="text" className="form-control" id="price" name="price" value={product.price} onChange={handleChange} />
           </div>
-        
+
           <div className="mb-3">
             <label htmlFor="image" className="form-label">Image</label>
             <input type="file" className="form-control" id="image" name="image" value={product.image} onChange={handleChange} />
           </div>
           <button type="submit" className="btn btn-primary">Update Product</button>
-          <button type="submit" className="btn btn-primary mx-5"onClick={handleShowAllBook}>Show All Books</button>
+          <button type="submit" className="btn btn-primary mx-5" onClick={handleShowAllBook}>Show All Books</button>
         </form>
       </div>
     </div>

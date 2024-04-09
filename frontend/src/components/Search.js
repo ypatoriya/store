@@ -22,27 +22,37 @@ const Search = () => {
         navigate('/allProducts');
     }
     const handleSearch = async (e) => {
-      e.preventDefault();
-      try {
-          const xhr = new XMLHttpRequest();
-          xhr.open('GET', `http://localhost:5000/api/search?name=${query}`, true);
-          xhr.onload = function () {
-              if (xhr.status === 200) {
-                  console.log(xhr.responseText);
-                  setSearchResults(JSON.parse(xhr.responseText));
-              } else {
-                  console.error('Request failed. Status:', xhr.status);
-              }
-          };
-          xhr.onerror = function () {
-              console.error('Request failed. Network error');
-          };
-          xhr.send();
-      } catch (error) {
-          console.error('Error fetching search results:', error);
-      }
-  };
-  
+        e.preventDefault();
+        try {
+            const token = localStorage.getItem('accessToken');
+
+            if (!token) {
+                console.log('No token found. User is not authenticated.');
+                navigate('/');
+                return;
+            }
+
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `http://localhost:5000/api/search?name=${query}`, true);
+            xhr.setRequestHeader('Authorization', token);
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    console.log(xhr.responseText);
+                    setSearchResults(JSON.parse(xhr.responseText));
+                } else {
+                    console.error('Request failed. Status:', xhr.status);
+                }
+            };
+            xhr.onerror = function () {
+                console.error('Request failed. Network error');
+            };
+            xhr.send();
+        } catch (error) {
+            console.error('Error fetching search results:', error);
+        }
+    };
+
 
     return (
         <div className="container mt-5">
@@ -57,13 +67,13 @@ const Search = () => {
                         <div class="d-flex align-items-center">
                             <div class="dropdown">
                                 <button className="btn btn-warning btn-sm mx-5" type="button" onClick={handleLogout}>Log Out</button>
-                                <a class="navbar-brand mt-2 mt-lg-0" href='' onClick={handleImageClick}>
+                                {/* <a class="navbar-brand mt-2 mt-lg-0" href='' >
                                     <img
-                                        src=""
+                                        src={`http://localhost:5000/assets/${user.profile_pic}`}
                                         height="15"
                                         alt="user"
                                     />
-                                </a>
+                                </a> */}
                             </div>
                         </div>
                     </div>
@@ -109,7 +119,7 @@ const Search = () => {
                                     <th>Price</th>
                                     <th>Category</th>
                                     <th>Category ID</th>
-                                    
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -120,7 +130,7 @@ const Search = () => {
                                         <td>{result.price}</td>
                                         <td>{result.category}</td>
                                         <td>{result.categoryId}</td>
-                                        
+
                                     </tr>
                                 ))}
                             </tbody>

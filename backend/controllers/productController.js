@@ -1,5 +1,9 @@
 const { QueryTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
+const jwt = require('jsonwebtoken');
+const userController = require('../controllers/userController');
+const { verifyToken } = require('../config/auth');
+const { registerUser, loginUser, getUserProfile, getImage } = userController;
 
 
 //create product
@@ -7,23 +11,26 @@ const createProduct = async (req, res) => {
   try {
     const { name, description, categoryId, price } = req.body;
     const images = req.files ? Object.values(req.files) : [];
+    console.log(req.body)
+
+    const createdBy = req.user.id
 
     const result = await sequelize.query(
-      'INSERT INTO product (name, description, categoryId, price, images) VALUES (?, ?, ?, ?)',
+      'INSERT INTO product (name, description, categoryId, price, createdBy) VALUES (?, ?, ?, ?, ?)',
       {
-        replacements: [name, description, categoryId, price],
+        replacements: [name, description, categoryId, price, createdBy],
         type: QueryTypes.INSERT
       }
     );
 
-    const productId = result[0];
+    const productId = req.params.id
 
     for (const image of images) {
       await sequelize.query(
-          'INSERT INTO product_images (product_id, image_path) VALUES (?, ?)',
-          { replacements: [productId, image.name], type: QueryTypes.INSERT }
+        'INSERT INTO product_images (product_id, image_path) VALUES (?, ?)',
+        { replacements: [productId, image.name], type: QueryTypes.INSERT }
       );
-  }
+    }
 
     res.json({ message: 'Product created!', id: result[0] });
   } catch (error) {
@@ -86,7 +93,7 @@ const updateProduct = async (req, res) => {
 
     await sequelize.query(
       'UPDATE product SET name = ?, description = ?, categoryId = ?, price = ?, images = ? WHERE id = ?',
-      { replacements: [name, description, categoryId, price, images, productId]}
+      { replacements: [name, description, categoryId, price, images, productId] }
     );
     res.json({ message: 'Product updated successfully' });
   } catch (error) {
@@ -114,8 +121,10 @@ const deleteProduct = async (req, res) => {
 //search
 const searchProducts = async (req, res) => {
   try {
+
     const { name } = req.query;
     console.log(name);
+
     if (!name) {
       return res.status(400).json({ error: 'Search query is required' });
     }

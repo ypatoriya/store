@@ -123,7 +123,6 @@ const ProductTable = () => {
 
                 const response = await axios.get(`http://localhost:5000/api/users/profile/1`, { headers });
                 setUser(response.data);
-                console.log(user.profile_pic);
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
@@ -153,9 +152,9 @@ const ProductTable = () => {
                             <button className="btn btn-warning btn-sm mx-5" type="button" onClick={handleLogout}>Log Out</button>
                             <a class="navbar-brand mt-2 mt-lg-0" href='' onClick={handleImageClick}>
                                 <img
-                                    src={user.profile_pic}
-                                    height="15"
-                                    width="15"
+                                    src={`http://localhost:5000/assets/${user.profile_pic}`}
+                                    height="30"
+                                    width="30"
                                     alt="user" />
                             </a>
                         </div>
@@ -183,11 +182,11 @@ const ProductTable = () => {
                             <td>{product.categoryId}</td>
                             <td>{product.price}</td>
                             <td>
-                                <div>
+                                {/* <div>
                                     {product.images.map((imagePath, index) => (
-                                        <img key={index} src={`/uploads/${imagePath}`} alt={`Product ${index}`} />
+                                        <img key={index} src={`public/assests/${imagePath}`} alt={`Product ${index}`} />
                                     ))}
-                                </div>
+                                </div> */}
                             </td>
                             <td>{<button className="btn btn-primary btn-sm" onClick={() => navigate(`/editProduct/${product.id}`)}>Edit</button>}</td>
                             <td>{<button className="btn btn-danger btn-sm" onClick={() => handleDelete(product.id)}>Delete</button>}</td>

@@ -9,8 +9,7 @@ const ProductForm = ({ onSubmit }) => {
         name: '',
         description: '',
         categoryId: '',
-        price: '',
-        images: null
+        price: ''
     });
 
     const navigate = useNavigate();
@@ -32,45 +31,45 @@ const ProductForm = ({ onSubmit }) => {
     }
 
     const handleSubmit = (e) => {
+
         e.preventDefault();
-        if (!formData.name || !formData.description || !formData.categoryId || !formData.price || !formData.images) {
-            setErrorMessage('All fields are required!');
-            return;
-        }
-        const { name, description, categoryId, price, images } = formData;
-        const formData = new FormData();
-        formData.append('name', name);
-        formData.append('description', description);
-        formData.append('categoryId', categoryId);
-        formData.append('price', price);
-        for (let i = 0; i < images.length; i++) {
-            formData.append('images', images[i]);
-        }
+        try {
 
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', 'http://localhost:5000/api/createProducts', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    console.log('Product created successfully');
-
-                } else {
-                    console.error('Error creating product:', xhr.responseText);
-
-                }
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                console.log('No token found. User is not authenticated.');
+                navigate("/")
             }
-        };
-        xhr.send(
-            JSON.stringify({
-                name,
-                description,
-                categoryId,
-                price,
-                images: images.name
-            })
-        );
-        navigate('/allProducts');
+
+
+            if (!formData.name || !formData.description || !formData.categoryId || !formData.price) {
+                setErrorMessage('All fields are required!');
+                return;
+            }
+
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'http://localhost:5000/api/createProducts', true);
+            xhr.setRequestHeader('Authorization', token);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(
+                JSON.stringify(formData)
+            );
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        console.log('Product created successfully');
+                        navigate('/allProducts');
+                    } else {
+                        console.error('Error creating product:', xhr.responseText);
+                    }
+                }
+            };
+
+        } catch (error) {
+            console.error('Error creating product:', error);
+            setErrorMessage('Error creating product. Please try again.');
+        }
     };
 
     return (
@@ -96,31 +95,30 @@ const ProductForm = ({ onSubmit }) => {
                             <label htmlFor="price">Price</label>
                             <input type="text" className="form-control" id="price" name="price" value={formData.price} onChange={handleChange} />
                         </div>
+
                         <div className="form-group mx-4 mt-3">
-                            <label htmlFor="images">Images</label>
-                            <div className="custom-file mx-3 mt-3">
-                                <input type="file" className="custom-file-input" id="images" name="images" onChange={handleFileChange} />
-                            </div>
+                            <label htmlFor="images" className="form-label">Images</label>
+                            <input type="file" className="form-control" id="images" name="images" onChange={handleFileChange} />
                         </div>
                     </div>
                 </Col>
             </Row>
             <div className="addproduct-buttons mt-5">
-            <div>
+                <div>
                     <button className="btn btn-primary" onClick={handleShowAllProducts}>
-                            Show All Products
-                        </button>
+                        Show All Products
+                    </button>
                 </div>
                 <div className='right-section'>
                     <button className="btn btn-danger " onClick={handleCancel}>
-                            Cancel
-                        </button>
+                        Cancel
+                    </button>
                     <button className="btn btn-primary " onClick={handleSubmit}>
                         Submit
                     </button>
                 </div>
             </div>
-           
+
         </Container>
 
     );

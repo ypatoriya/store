@@ -3,9 +3,11 @@ const { QueryTypes } = require('sequelize');
 
 
 // Function to create a new category
+
 const createCategory = async (req, res) => {
   try {
     const { categoryname, createdBy } = req.body;
+
     const result = await sequelize.query(
       'INSERT INTO category (categoryname, createdBy) VALUES (?, ?)',
       {
@@ -13,7 +15,7 @@ const createCategory = async (req, res) => {
         type: QueryTypes.INSERT
       }
     );
-    // Return the ID of the newly created category
+
     res.json({ message: 'Category created!', id: result[0] });
   } catch (error) {
     console.error('Error creating category:', error);
@@ -28,6 +30,7 @@ const getAllCategories = async (req, res) => {
       'SELECT * FROM category',
       { type: QueryTypes.SELECT }
     );
+
     res.json(categories);
   } catch (error) {
     console.error('Error fetching categories:', error);
@@ -36,6 +39,7 @@ const getAllCategories = async (req, res) => {
 };
 
 // Function to get a specific category by ID
+
 const getCategoryById = async (req, res) => {
   try {
     const categoryId = req.params.id;
@@ -54,10 +58,13 @@ const getCategoryById = async (req, res) => {
   }
 };
 
+
 // Function to update a category
+
 const updateCategory = async (req, res) => {
   try {
     const categoryId = req.params.id;
+
     const { categoryname } = req.body;
 
     await sequelize.query(
@@ -71,7 +78,9 @@ const updateCategory = async (req, res) => {
   }
 };
 
+
 // Function to delete a category
+
 const deleteCategory = async (req, res) => {
   try {
     const categoryId = req.params.id;
