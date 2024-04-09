@@ -6,10 +6,12 @@ const verifyToken = require('../config/auth')
 const fs = require('fs');
 const path = require('path');
 
+
 const generateToken = (user) => {
   const payload = { email: user.email, password: user.password, id: user.id };
   return jwt.sign(payload, 'crud', { expiresIn: '24h' });
 };
+
 
 // Function to register a new user
 const registerUser = async (req, res) => {
@@ -20,7 +22,6 @@ const registerUser = async (req, res) => {
 
     const profile_pic = req.file.filename;
 
-
     const result = await sequelize.query(
       'INSERT INTO users (firstName, lastName, email, password, gender, hobbies, userRole, profile_pic) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
       {
@@ -30,6 +31,7 @@ const registerUser = async (req, res) => {
     );
     res.json({ message: `User created!` });
   } catch (error) {
+
     console.error('Error registering user:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -44,15 +46,17 @@ const loginUser = async (req, res) => {
       { replacements: [email], type: QueryTypes.SELECT });
 
     if (existingUser) {
+
       const user = existingUser;
 
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (passwordMatch) {
+
         const token = generateToken(user);
         const userId = user.id;
         const userRole = user.userRole;
-        console.log(userRole, userId);
+      
         return res.status(200).send({ message: 'Login success!', token: token, userId: userId, userRole: userRole });
       } else {
         return res.status(401).send({ message: 'Incorrect password!' });
