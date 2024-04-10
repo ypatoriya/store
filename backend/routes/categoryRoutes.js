@@ -5,7 +5,7 @@ const { verifyToken } = require('../middlewares/authMiddleware');
 const { createCategory, getAllCategories, getCategoryById, updateCategory, deleteCategory } = require('../controllers/categoryController');
 
 // Create a new category
-router.post('/createCategory', createCategory);
+router.post('/createCategory', verifyToken, createCategory);
 
 // Get all categories
 router.get('/allCategory', getAllCategories);
@@ -14,9 +14,9 @@ router.get('/allCategory', getAllCategories);
 //router.get('/category/:id', getCategoryById);
 
 // Update a category
-router.put('/category/:id', updateCategory); 
+router.put('/category/:id',verifyToken, updateCategory); 
 
 // Delete a category
-router.delete('/deleteCategory/:id', deleteCategory);
+router.delete('/deleteCategory/:id',verifyToken, deleteCategory);
 
 module.exports = router;

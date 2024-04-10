@@ -16,7 +16,7 @@ const ProductTable = () => {
 
     const handleSearch = () => {
         if (query.trim() !== '') {
-            navigate(`/search/?name=${encodeURIComponent(query)}`); // Navigate to search page with encoded query
+            navigate(`/search/?name=${encodeURIComponent(query)}`);
         }
     };
 
@@ -146,15 +146,13 @@ const ProductTable = () => {
 
                     </div>
 
-                    <div class="d-flex align-items-center">
-                        <div class="navbar-right">
-                            <div class="d-flex align-items-center"> <input  type="text"
-                            className="form-control"
+                    <div class="d-flex right-menu"> <input  type="text"
+                            className="search-input"
                             placeholder="Search..."
                             value={query}
                             onChange={(e) => setQuery(e.target.value)} />
-                                <button className="btn btn-primary btn-sm mx-5" type="button" onClick={handleSearch}>Search</button>
-                                <button className="btn btn-warning btn-sm mx-5" type="button" onClick={handleLogout}>Log Out</button>
+                                <button className="btn btn-primary btn-sm " type="button" onClick={handleSearch}>Search</button>
+                                <button className="btn btn-warning logout-button " type="button" onClick={handleLogout}>Log Out</button>
                                 <a class="navbar-brand mt-2 mt-lg-0" href='' onClick={handleImageClick}>
                                     <img
                                         src={`http://localhost:5000${user.profile_pic}`}
@@ -163,8 +161,6 @@ const ProductTable = () => {
                                         alt="user" />
                                 </a>
                             </div>
-                        </div>
-                    </div>
                 </div>
             </nav>
             {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
