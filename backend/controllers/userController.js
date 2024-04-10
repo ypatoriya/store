@@ -2,13 +2,13 @@ const bcrypt = require('bcrypt');
 const { sequelize } = require('../config/database');
 const { QueryTypes } = require('sequelize');
 const jwt = require('jsonwebtoken');
-const verifyToken = require('../config/auth')
+const verifyToken = require('../middlewares/authMiddleware');
 const fs = require('fs');
 const path = require('path');
 
 
 const generateToken = (user) => {
-  const payload = { email: user.email, password: user.password, id: user.id };
+  const payload = { email: user.email, password: user.password, id: user.id, profile_pic: user.profile_pic };
   return jwt.sign(payload, 'crud', { expiresIn: '24h' });
 };
 
@@ -17,19 +17,40 @@ const generateToken = (user) => {
 const registerUser = async (req, res) => {
   try {
 
-    const { firstName, lastName, email, password, gender, hobbies, userRole } = req.body;
+    const { firstName, lastName, email, password, gender, hobbies} = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const profile_pic = req.file.filename;
+    const profile_pic= req.files.profile_pic
 
-    const result = await sequelize.query(
-      'INSERT INTO users (firstName, lastName, email, password, gender, hobbies, userRole, profile_pic) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      {
-        replacements: [firstName, lastName, email, hashedPassword, gender, hobbies, userRole, profile_pic],
-        type: QueryTypes.INSERT
+    // if(profile_pic.length>1){
+    //     throw new error('multiple file not allowed!')
+    // }
+
+    const dirExists = fs.existsSync(`public/assets/`);
+
+    if (!dirExists) {
+      fs.mkdirSync(`public/assets/`, { recursive: true });
+    }
+
+    if (profile_pic == undefined || profile_pic == null) throw new Error("file not found!");
+
+    let savePath = `/public/assets/${Date.now()}.${profile_pic.name.split(".").pop()}`
+    
+    profile_pic.mv(path.join(__dirname, ".." + savePath), async (err) => {
+      if (err) throw new Error("error in uploading")
+
+      else {
+        const result = await sequelize.query(
+          'INSERT INTO users (firstName, lastName, email, password, gender, hobbies, profile_pic) VALUES (?, ?, ?, ?, ?, ?, ?)',
+          {
+            replacements: [firstName, lastName, email, hashedPassword, gender, hobbies, savePath],
+            type: QueryTypes.INSERT
+          }
+        );
+        res.json({ message: `User created!` });
       }
-    );
-    res.json({ message: `User created!` });
+    });
+   
   } catch (error) {
 
     console.error('Error registering user:', error);
@@ -76,18 +97,12 @@ const loginUser = async (req, res) => {
 // Function to get user profile
 const getUserProfile = async (req, res) => {
   try {
-    const userId = req.params.id;
-    console.log(`userId: ${userId}`);
-    const user = await sequelize.query(
-      'SELECT * FROM users WHERE id = ?', {
-      replacements: [userId],
-      type: sequelize.QueryTypes.SELECT
-    })
-
-    if (user.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
+    const user = req.user
+  
+    if (user) {
+      return res.status(200).json({ user: user });
     }
-    res.json(user[0]);
+    
   } catch (error) {
     console.error('Error fetching user profile:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -113,8 +128,6 @@ const getImage = async (req, res) => {
     }
 
     if (image == undefined || image == null) throw new Error("file not found!");
-
-    // let savePath = `/public/assets/${Date.now()}.${image.name.split(".").pop()}`
 
     let savePath = `/public/assets/${Date.now()}.${image.name.split(".").pop()}`
     

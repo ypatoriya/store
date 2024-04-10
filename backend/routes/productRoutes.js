@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const productController = require('../controllers/productController');
-const { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, searchProducts } = productController;
-const { verifyToken } = require('../config/auth');
+const { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, searchProducts } = require('../controllers/productController');
+const { verifyToken } = require('../middlewares/authMiddleware');
 const { registerUser, loginUser, getUserProfile, getImage } = require('../controllers/userController');
 
 

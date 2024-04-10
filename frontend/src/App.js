@@ -7,6 +7,7 @@ import AddProduct from '../src/components/AddProduct';
 import Search from './components/Search';
 import AddCategory from './components/AddCategory';
 import EditProduct from './components/EditProduct';
+import AddUser from './components/AddUser';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Route path="/search" element={<Search />} />
       <Route path="/addCategory" element={<AddCategory />} />
       <Route path="/editProduct/:id" element={<EditProduct />} />
+      <Route path="/addUser" element={<AddUser />} />
     </Routes>
   );
 }

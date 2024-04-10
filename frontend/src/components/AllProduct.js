@@ -122,8 +122,9 @@ const ProductTable = () => {
                     'Authorization': token
                 };
 
-                const response = await axios.get(`http://localhost:5000/api/users/profile/1`, { headers });
-                setUser(response.data);
+                const response = await axios.get(`http://localhost:5000/api/users/profile`, { headers });
+                setUser(response.data.user);
+                
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
@@ -156,7 +157,7 @@ const ProductTable = () => {
                                 <button className="btn btn-warning btn-sm mx-5" type="button" onClick={handleLogout}>Log Out</button>
                                 <a class="navbar-brand mt-2 mt-lg-0" href='' onClick={handleImageClick}>
                                     <img
-                                        src={`http://localhost:5000/assets/${user.profile_pic}`}
+                                        src={`http://localhost:5000${user.profile_pic}`}
                                         height="30"
                                         width="30"
                                         alt="user" />

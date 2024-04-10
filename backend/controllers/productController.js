@@ -2,7 +2,7 @@ const { QueryTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 const jwt = require('jsonwebtoken');
 const userController = require('../controllers/userController');
-const { verifyToken } = require('../config/auth');
+const { verifyToken } = require('../middlewares/authMiddleware');
 const { registerUser, loginUser, getUserProfile, getImage } = userController;
 
 
@@ -11,7 +11,7 @@ const createProduct = async (req, res) => {
   try {
     const { name, description, categoryId, price } = req.body;
     const images = req.files ? Object.values(req.files) : [];
-    console.log(req.body)
+    console.log(images)
 
     const createdBy = req.user.id
 
@@ -150,5 +150,6 @@ const searchProducts = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
 
 module.exports = { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, searchProducts };

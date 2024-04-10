@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const { registerUser, loginUser, getUserProfile, getImage } = require('../controllers/userController');
+const { verifyToken } = require('../middlewares/authMiddleware');
 
 
 
@@ -12,7 +13,7 @@ router.post('/users/register', registerUser);
 router.post('/users/login', loginUser);
 
 // Get user profile by id
-router.get('/users/profile/:id', getUserProfile);
+router.get('/users/profile',verifyToken, getUserProfile);
 
 // Update user profile
 router.post('/users/editProfile/:id', getImage);
