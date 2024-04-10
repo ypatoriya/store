@@ -4,33 +4,54 @@ const jwt = require('jsonwebtoken');
 const userController = require('../controllers/userController');
 const { verifyToken } = require('../middlewares/authMiddleware');
 const { registerUser, loginUser, getUserProfile, getImage } = userController;
+const fs = require('fs');
+const path = require('path');
 
 
 //create product
 const createProduct = async (req, res) => {
   try {
     const { name, description, categoryId, price } = req.body;
-    const images = req.files ? Object.values(req.files) : [];
-    console.log(images)
-
+    const images = req.files ? Array.from(Object.values(req.files).flat()) : [];
     const createdBy = req.user.id
+    console.log(images)
+    
+    const dirExists = fs.existsSync(`public/assets/`);
+    if (!dirExists) {
+      fs.mkdirSync(`public/assets/`, { recursive: true });
+    }
+
+    // Array to store paths of uploaded images
+    let imagePaths = [];
+
+    // Upload each image and store its path
+    for (const image of images) {
+      if (!image || !image.name) {
+        throw new Error("Image or image name is undefined");
+      }
+
+      const savePath = `/public/assets/${Date.now()}.${image.name.split(".").pop()}`;
+
+      // Move the file to the destination
+      await new Promise((resolve, reject) => {
+        image.mv(path.join(__dirname, ".." + savePath), (err) => {
+          if (err) {
+            reject(new Error("Error in uploading"));
+          } else {
+            imagePaths.push(savePath);
+            resolve();
+          }
+        });
+      });
+    }
 
     const result = await sequelize.query(
-      'INSERT INTO product (name, description, categoryId, price, createdBy) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO product (name, description, categoryId, price, createdBy, images) VALUES (?, ?, ?, ?, ?,?)',
       {
-        replacements: [name, description, categoryId, price, createdBy],
+        replacements: [name, description, categoryId, price, createdBy, imagePaths.join(',')],
         type: QueryTypes.INSERT
       }
     );
-
-    const productId = result[0];
-
-    for (const image of images) {
-      await sequelize.query(
-        'INSERT INTO product_images (product_id, image_path) VALUES (?, ?)',
-        { replacements: [productId, image.name], type: QueryTypes.INSERT }
-      );
-    }
 
     res.json({ message: 'Product created!', id: result[0] });
   } catch (error) {
@@ -49,15 +70,17 @@ const getAllProducts = async (req, res) => {
 
     const products = await sequelize.query(
       `SELECT
-        p.id,
-        p.name,
-        p.description,
-        p.categoryId,
-        p.price,
-        (SELECT pi.image_path
-         FROM product_images pi
-         WHERE pi.product_id = p.id) AS images
-      FROM product p`,
+      p.id,
+      p.name,
+      p.description,
+      c.categoryName AS category_name,
+      p.price,
+      p.images
+    FROM
+      product AS p
+      JOIN category AS c ON p.categoryId = c.id
+    LIMIT ${pageSize}
+    OFFSET ${offset};`,
       { type: QueryTypes.SELECT }
     );
     res.json(products);
@@ -90,18 +113,55 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const productId = req.params.id;
-    const { name, description, categoryId, price, images } = req.body;
+    const { name, description, categoryId, price } = req.body;
 
+    // flat is used for merging an array of files into a single array
+    const images = req.files ? Array.from(Object.values(req.files).flat()) : [];
+
+    
+    const dirExists = fs.existsSync(`public/assets/`);
+    if (!dirExists) {
+      fs.mkdirSync(`public/assets/`, { recursive: true });
+    }
+
+    // Array to store paths of uploaded images
+    let imagePaths = [];
+
+    // Upload each image and store its path
+    for (const image of images) {
+      if (!image || !image.name) {
+        throw new Error("Image or image name is undefined");
+      }
+
+      const savePath = `/public/assets/${Date.now()}.${image.name.split(".").pop()}`;
+
+      // Move the file to the destination
+      await new Promise((resolve, reject) => {
+        image.mv(path.join(__dirname, ".." + savePath), (err) => {
+          if (err) {
+            reject(new Error("Error in uploading"));
+          } else {
+            imagePaths.push(savePath);
+            resolve();
+          }
+        });
+      });
+    }
+
+    // Update product with new data including images
     await sequelize.query(
       'UPDATE product SET name = ?, description = ?, categoryId = ?, price = ?, images = ? WHERE id = ?',
-      { replacements: [name, description, categoryId, price, images, productId] }
+      { replacements: [name, description, categoryId, price, imagePaths.join(','), productId] }
     );
+
     res.json({ message: 'Product updated successfully' });
   } catch (error) {
     console.error('Error updating product:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+
 
 // delete a product
 const deleteProduct = async (req, res) => {

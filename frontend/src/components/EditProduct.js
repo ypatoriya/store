@@ -5,7 +5,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 const UpdateBook = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [product, setProduct] = useState({});
+  const [product, setProduct] = useState({
+    name: '',
+    description: '',
+    categoryId: '',
+    price: '',
+    image: '',
+  });
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
@@ -53,9 +59,13 @@ const UpdateBook = () => {
     navigate('/allProducts');
   };
 
+  const handleFileChange = (e) => {
+    setProduct({ ...product, images: e.target.files });
+};
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!product.name || !product.description || !product.categoryId || !product.price || !product.image) {
+    if (!product.name || !product.description || !product.categoryId || !product.price) {
       setErrorMessage('All fields are required!');
       return;
     }
@@ -64,7 +74,7 @@ const UpdateBook = () => {
         method: 'PUT',
         headers: {
           'Authorization': localStorage.getItem('accessToken'),
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json, multipart/form-data',
         },
         body: JSON.stringify(product),
       });
@@ -117,7 +127,7 @@ const UpdateBook = () => {
 
           <div className="mb-3">
             <label htmlFor="image" className="form-label">Image</label>
-            <input type="file" className="form-control" id="image" name="image" value={product.image} onChange={handleChange} />
+            <input type="file" className="form-control" id="image" name="image" onChange={handleFileChange} />
           </div>
           <button type="submit" className="btn btn-primary">Update Product</button>
           <button type="submit" className="btn btn-primary mx-5" onClick={handleShowAllBook}>Show All Books</button>

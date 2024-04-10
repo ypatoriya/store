@@ -124,7 +124,7 @@ const ProductTable = () => {
 
                 const response = await axios.get(`http://localhost:5000/api/users/profile`, { headers });
                 setUser(response.data.user);
-                
+
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
@@ -146,21 +146,21 @@ const ProductTable = () => {
 
                     </div>
 
-                    <div class="d-flex right-menu"> <input  type="text"
-                            className="search-input"
-                            placeholder="Search..."
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)} />
-                                <button className="btn btn-primary btn-sm " type="button" onClick={handleSearch}>Search</button>
-                                <button className="btn btn-warning logout-button " type="button" onClick={handleLogout}>Log Out</button>
-                                <a class="navbar-brand mt-2 mt-lg-0" href='' onClick={handleImageClick}>
-                                    <img
-                                        src={`http://localhost:5000${user.profile_pic}`}
-                                        height="30"
-                                        width="30"
-                                        alt="user" />
-                                </a>
-                            </div>
+                    <div class="d-flex right-menu"> <input type="text"
+                        className="search-input"
+                        placeholder="Search..."
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)} />
+                        <button className="btn btn-primary btn-sm " type="button" onClick={handleSearch}>Search</button>
+                        <button className="btn btn-warning logout-button " type="button" onClick={handleLogout}>Log Out</button>
+                        <a class="navbar-brand mt-2 mt-lg-0" href='' onClick={handleImageClick}>
+                            <img
+                                src={`http://localhost:5000${user.profile_pic}`}
+                                height="30"
+                                width="30"
+                                alt="user" />
+                        </a>
+                    </div>
                 </div>
             </nav>
             {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
@@ -170,7 +170,7 @@ const ProductTable = () => {
                         <th>ID</th>
                         <th>Name</th>
                         <th>Description</th>
-                        <th>Category ID</th>
+                        <th>Category</th>
                         <th>Price</th>
                         <th>Images</th>
                         <th>Action</th>
@@ -183,14 +183,19 @@ const ProductTable = () => {
                             <td>{product.id}</td>
                             <td>{product.name}</td>
                             <td>{product.description}</td>
-                            <td>{product.categoryId}</td>
+                            <td>{product.category_name}</td>
                             <td>{product.price}</td>
                             <td>
-                                {/* <div>
-                                    {product.images.map((imagePath, index) => (
-                                        <img key={index} src={`public/assests/${imagePath}`} alt={`Product ${index}`} />
+                                <div>
+                                    {product.images && product.images.split(',').map((imagePath, index) => (
+                                        <img
+                                            key={index}
+                                            src={`http://localhost:5000${imagePath}`}
+                                            alt={`Product ${index}`}
+                                            style={{ width: '50px', height: '50px', margin: '10px' }}
+                                        />
                                     ))}
-                                </div> */}
+                                </div>
                             </td>
                             <td>{<button className="btn btn-primary btn-sm" onClick={() => navigate(`/editProduct/${product.id}`)}>Edit</button>}</td>
                             <td>{<button className="btn btn-danger btn-sm" onClick={() => handleDelete(product.id)}>Delete</button>}</td>

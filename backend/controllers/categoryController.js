@@ -27,9 +27,19 @@ const createCategory = async (req, res) => {
   }
 };
 
+
+// Function to get all categories
 const getAllCategories = async (req, res) => {
+
   try {
     
+  const userRole  = req.user.userRole
+  console.log(userRole)
+
+  if(userRole != 'Admin'){
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
     const categories = await sequelize.query(
       'SELECT * FROM category',
       { type: QueryTypes.SELECT }

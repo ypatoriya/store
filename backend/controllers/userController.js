@@ -8,7 +8,7 @@ const path = require('path');
 
 
 const generateToken = (user) => {
-  const payload = { email: user.email, password: user.password, id: user.id, profile_pic: user.profile_pic };
+  const payload = { email: user.email, password: user.password, id: user.id, profile_pic: user.profile_pic, userRole: user.userRole };
   return jwt.sign(payload, 'crud', { expiresIn: '24h' });
 };
 
@@ -48,7 +48,7 @@ const registerUser = async (req, res) => {
           }
         );
         res.json({ message: `User created!` });
-      }
+      } 
     });
    
   } catch (error) {

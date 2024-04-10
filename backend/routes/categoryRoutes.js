@@ -8,7 +8,7 @@ const { createCategory, getAllCategories, getCategoryById, updateCategory, delet
 router.post('/createCategory', verifyToken, createCategory);
 
 // Get all categories
-router.get('/allCategory', getAllCategories);
+router.get('/allCategory',verifyToken, getAllCategories); 
 
 // Get a specific category by ID
 //router.get('/category/:id', getCategoryById);
