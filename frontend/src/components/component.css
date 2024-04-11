@@ -37,3 +37,9 @@
     display: flex;
     justify-content: space-around;
 }
+
+.last-buttons{
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}

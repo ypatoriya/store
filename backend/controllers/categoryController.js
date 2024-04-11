@@ -5,8 +5,8 @@ const verifyToken = require('../middlewares/authMiddleware');
 const fs = require('fs');
 const path = require('path');
 
-// Function to create a new category
 
+// Function to create a new category
 const createCategory = async (req, res) => {
   try {
     const { categoryname } = req.body;
@@ -27,25 +27,27 @@ const createCategory = async (req, res) => {
   }
 };
 
-
 // Function to get all categories
 const getAllCategories = async (req, res) => {
 
   try {
-    
+
   const userRole  = req.user.userRole
-  console.log(userRole)
-
-  if(userRole != 'Admin'){
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-    const categories = await sequelize.query(
-      'SELECT * FROM category',
-      { type: QueryTypes.SELECT }
+  const userId = req.user.id
+  
+    const category = await sequelize.query(
+      `SELECT * FROM category WHERE createdBy = :userId`,
+      {
+        replacements: { userId },
+        type: sequelize.QueryTypes.SELECT,
+      }
     );
 
-    res.json(categories);
+    if (category.length === 0) {
+      return res.status(404).json({ message: "Category not found!" });
+    }
+ 
+    res.json(category);
   } catch (error) {
     console.error('Error fetching categories:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -53,7 +55,6 @@ const getAllCategories = async (req, res) => {
 };
 
 // Function to get a specific category by ID
-
 const getCategoryById = async (req, res) => {
   try {
     const categoryId = req.params.id;
@@ -74,7 +75,6 @@ const getCategoryById = async (req, res) => {
 
 
 // Function to update a category
-
 const updateCategory = async (req, res) => {
   try {
     const categoryId = req.params.id;

@@ -8,6 +8,7 @@ import Search from './components/Search';
 import AddCategory from './components/AddCategory';
 import EditProduct from './components/EditProduct';
 import AddUser from './components/AddUser';
+import Category from './components/Category';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
       <Route path="/addCategory" element={<AddCategory />} />
       <Route path="/editProduct/:id" element={<EditProduct />} />
       <Route path="/addUser" element={<AddUser />} />
+      <Route path='/category' element={<Category />} />
     </Routes>
   );
 }

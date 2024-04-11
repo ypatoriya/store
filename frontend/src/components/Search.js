@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './component.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate, Link } from 'react-router-dom';
+import { Container, Form, Button, Alert } from 'react-bootstrap';
+import { useNavigate} from 'react-router-dom';
 
 const Search = () => {
     const [query, setQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const navigate = useNavigate()
     const handleClick = (e) => {
@@ -18,9 +20,6 @@ const Search = () => {
         navigate('/');
     }
 
-    const handleImageClick = () => {
-        navigate('/allProducts');
-    }
     const handleSearch = async (e) => {
         e.preventDefault();
         try {
@@ -32,6 +31,10 @@ const Search = () => {
                 return;
             }
 
+            if(query===""){
+                setErrorMessage('Please enter a search query');
+                return;
+            }
 
             const xhr = new XMLHttpRequest();
             xhr.open('GET', `http://localhost:5000/api/search?name=${query}`, true);
@@ -67,17 +70,11 @@ const Search = () => {
                         <div class="d-flex align-items-center">
                             <div class="dropdown">
                                 <button className="btn btn-warning btn-sm mx-5" type="button" onClick={handleLogout}>Log Out</button>
-                                {/* <a class="navbar-brand mt-2 mt-lg-0" href='' >
-                                    <img
-                                        src={`http://localhost:5000/assets/${user.profile_pic}`}
-                                        height="15"
-                                        alt="user"
-                                    />
-                                </a> */}
                             </div>
                         </div>
                     </div>
                 </nav>
+                {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
                 <div className="col-md-6">
                     <div className="input-group mb-4">
                         <input

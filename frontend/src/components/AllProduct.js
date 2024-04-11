@@ -14,10 +14,50 @@ const ProductTable = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [user, setUser] = useState([])
     const [query, setQuery] = useState('');
+    const [deletedProductId, setDeletedProductId] = useState(null);
 
-    const handleSearch = () => {
-        if (query.trim() !== '') {
-           navigate(`/search/?name=${encodeURIComponent(query)}`);
+    const handleSearch = async (e) => {
+        e.preventDefault();
+        try {
+            const token = localStorage.getItem('accessToken');
+
+            if (!token) {
+                console.log('No token found. User is not authenticated.');
+                navigate('/');
+                return;
+            }
+
+            if (query === "") {
+                // Load all products if no search query
+                const response = await fetch('http://localhost:5000/api/products', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': token
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setProducts(data);
+                } else {
+                    console.error('Request failed. Status:', response.status);
+                }
+            } else {
+                // Load filtered products if there's a search query
+                const response = await fetch(`http://localhost:5000/api/search?name=${query}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': token
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setProducts(data);
+                } else {
+                    console.error('Request failed. Status:', response.status);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
         }
     };
 
@@ -33,6 +73,9 @@ const ProductTable = () => {
         }
     };
 
+    const handleCategory= () => {
+        navigate('/category');
+    }
 
     const handleLogout = () => {
         localStorage.removeItem('accessToken');
@@ -48,40 +91,44 @@ const ProductTable = () => {
     }
 
     const handleDelete = (id) => {
-
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-            console.log('No token found. User is not authenticated.');
-            navigate("/")
-        }
-
         const isConfirmed = window.confirm('Are you sure you want to delete this product?');
-
-        if (!isConfirmed) {
-            return;
+    
+        if (isConfirmed) {
+            deleteProduct(id);
         }
+    };
 
-        const xhr = new XMLHttpRequest();
-        xhr.open('DELETE', `http://localhost:5000/api/deleteProducts/${id}`, true);
-        xhr.setRequestHeader('Authorization', token);
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                setErrorMessage('Product deleted successfully');
-                console.log('product deleted successfully');
-                window.location.reload()
-                
-            } else {
-                setErrorMessage("Failed to delete product. As you have products/category.");
-                console.error('Failed to delete product. Status:', xhr.status);
-                window.location.reload()
+    const deleteProduct = async (id) => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                console.log('No token found. User is not authenticated.');
+                navigate('/');
+                return;
             }
-        };
-        xhr.onerror = function () {
+    
+            const response = await fetch(`http://localhost:5000/api/deleteProducts/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': token,
+                },
+            });
+    
+            if (response.ok) {
+                setErrorMessage('Product deleted successfully');
+                console.log('Product deleted successfully');
+                // Set the deleted product's ID
+                setDeletedProductId(id);
+            } else {
+                setErrorMessage("Failed to delete product.");
+                console.error('Failed to delete product. Status:', response.status);
+            }
+        } catch (error) {
             setErrorMessage('Error deleting product. Network error');
-            console.error('Error deleting product. Network error');
-        };
-        xhr.send();
-    }
+            console.error('Error deleting product. Network error:', error);
+        }
+    };
+
 
     useEffect(() => {
 
@@ -135,8 +182,8 @@ const ProductTable = () => {
         };
 
         fetchUser();
-        fetchProducts();
-    }, []);
+       fetchProducts();
+    }, [deletedProductId]);
 
 
     return (
@@ -168,7 +215,7 @@ const ProductTable = () => {
                 </div>
             </nav>
             {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
-            <table className="table">
+            <table className="table table-hover">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -217,6 +264,7 @@ const ProductTable = () => {
                         <button className="btn btn-primary btn-sm mx-5" type="button" onClick={handleNextPage} disabled={products.length < pageSize}>Next Page</button>
                 </div>
                 <button className="btn btn-primary btn-sm" type="button" onClick={handleClick}>Add Product</button>
+                <button className="btn btn-secondary btn-sm" type="button" onClick={handleCategory}>Category</button>
            </div>
         </div>
     );

@@ -59,7 +59,6 @@ const createProduct = async (req, res) => {
   }
 };
 
-
 // all products
 const getAllProducts = async (req, res) => {
   try {

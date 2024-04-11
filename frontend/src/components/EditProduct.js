@@ -10,11 +10,12 @@ const UpdateBook = () => {
     description: '',
     categoryId: '',
     price: '',
-    image: '',
+    images: [],
   });
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
+
     const fetchProductData = async () => {
 
       try {
@@ -61,7 +62,8 @@ const UpdateBook = () => {
   };
 
   const handleFileChange = (e) => {
-    setProduct({ ...product, images: e.target.files[0] });
+    const files = Array.from(e.target.files); // Convert FileList to an array
+  setProduct({ ...product, images: files });
 };
 
   const handleSubmit = async (e) => {
@@ -76,7 +78,10 @@ const UpdateBook = () => {
     updateData.append('description', product.description);
     updateData.append('categoryId', product.categoryId);
     updateData.append('price', product.price);
-    updateData.append('images', product.image); 
+
+    product.images.forEach((file, index) => {
+      updateData.append(`images[${index}]`, file);
+    });
     console.log(updateData)
 
     try {
@@ -84,7 +89,6 @@ const UpdateBook = () => {
         method: 'PUT',
         headers: {
           'Authorization': localStorage.getItem('accessToken'),
-          // 'Content-Type': 'multipart/form-data',
         },
         body: updateData 
       });
@@ -139,7 +143,7 @@ const UpdateBook = () => {
 
           <div className="mb-3">
             <label htmlFor="images" className="form-label">Image</label>
-            <input type="file" className="form-control" id="images" name="images" onChange={handleFileChange} />
+            <input type="file" className="form-control" id="images" name="images" multiple onChange={handleFileChange} />
           </div>
           <button type="submit" className="btn btn-primary">Update Product</button>
           <button type="submit" className="btn btn-primary mx-5" onClick={handleShowAllBook}>Show All Books</button>
