@@ -21,7 +21,7 @@ const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const profile_pic= req.files.profile_pic
-
+    
     // if(profile_pic.length>1){
     //     throw new error('multiple file not allowed!')
     // }

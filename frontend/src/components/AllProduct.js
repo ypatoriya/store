@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import './component.css';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
+import Search from './Search';
 
 
 const ProductTable = () => {
@@ -16,7 +17,7 @@ const ProductTable = () => {
 
     const handleSearch = () => {
         if (query.trim() !== '') {
-            navigate(`/search/?name=${encodeURIComponent(query)}`);
+           navigate(`/search/?name=${encodeURIComponent(query)}`);
         }
     };
 
@@ -68,6 +69,7 @@ const ProductTable = () => {
                 setErrorMessage('Product deleted successfully');
                 console.log('product deleted successfully');
                 window.location.reload()
+                
             } else {
                 setErrorMessage("Failed to delete product. As you have products/category.");
                 console.error('Failed to delete product. Status:', xhr.status);
@@ -75,6 +77,7 @@ const ProductTable = () => {
             }
         };
         xhr.onerror = function () {
+            setErrorMessage('Error deleting product. Network error');
             console.error('Error deleting product. Network error');
         };
         xhr.send();
@@ -115,6 +118,7 @@ const ProductTable = () => {
                 const token = localStorage.getItem('accessToken');
                 if (!token) {
                     console.log('No token found. User is not authenticated.');
+                    navigate("/");
                     return;
                 }
 
@@ -203,12 +207,17 @@ const ProductTable = () => {
                     ))}
                 </tbody>
             </table>
-            <button className="btn btn-primary btn-sm" type="button" onClick={handleClick}>Add Product</button>
+            
 
-            <button className="btn btn-primary btn-sm mx-5" type="button" onClick={handlePreviousPage} disabled={page === 1}>Previous Page</button>
-            <span className="mx-2">Page {page}</span>
+           <div className='allproduct-button'>
+                <div>
+                        <button className="btn btn-primary btn-sm mx-5" type="button" onClick={handlePreviousPage} disabled={page === 1}>Previous Page</button>
+                        <span className="mx-2">Page {page}</span>
 
-            <button className="btn btn-primary btn-sm mx-5" type="button" onClick={handleNextPage} disabled={products.length < pageSize}>Next Page</button>
+                        <button className="btn btn-primary btn-sm mx-5" type="button" onClick={handleNextPage} disabled={products.length < pageSize}>Next Page</button>
+                </div>
+                <button className="btn btn-primary btn-sm" type="button" onClick={handleClick}>Add Product</button>
+           </div>
         </div>
     );
 };

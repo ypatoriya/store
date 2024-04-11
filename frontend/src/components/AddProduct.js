@@ -9,7 +9,8 @@ const ProductForm = ({ onSubmit }) => {
         name: '',
         description: '',
         categoryId: '',
-        price: ''
+        price: '',
+        images: ''
     });
 
     const navigate = useNavigate();
@@ -19,7 +20,7 @@ const ProductForm = ({ onSubmit }) => {
     };
 
     const handleFileChange = (e) => {
-        setFormData({ ...formData, images: e.target.files });
+        setFormData({ ...formData, images: e.target.files[0] });
     };
 
     const handleShowAllProducts = () => {
@@ -47,13 +48,19 @@ const ProductForm = ({ onSubmit }) => {
                 return;
             }
 
+            const formsdata = new FormData();
+            formsdata.append('name', formData.name);
+            formsdata.append('description', formData.description);
+            formsdata.append('categoryId', formData.categoryId);
+            formsdata.append('price', formData.price);
+            formsdata.append('images', formData.images);
 
             const xhr = new XMLHttpRequest();
             xhr.open('POST', 'http://localhost:5000/api/createProducts', true);
             xhr.setRequestHeader('Authorization', token);
-            xhr.setRequestHeader('Content-Type', 'application/json');
+            // xhr.setRequestHeader('Content-Type', 'multipart/form-data');
             xhr.send(
-                JSON.stringify(formData)
+                formsdata
             );
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === XMLHttpRequest.DONE) {

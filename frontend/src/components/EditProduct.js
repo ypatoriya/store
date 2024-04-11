@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, json } from 'react-router-dom';
 
 const UpdateBook = () => {
   const { id } = useParams();
@@ -28,14 +28,15 @@ const UpdateBook = () => {
 
         const response = await fetch(`http://localhost:5000/api/productById/${id}`, {
           headers: {
-            'Authorization': token
+            'Authorization': token, 
+            'Content-type': 'multipart/form-data',
           }
         });
 
         if (response.status === 200) {
           const data = await response.json();
           setProduct(data);
-          console.log(data);
+        
         } else if (response.status === 401) {
           console.log('Unauthorized access. Token may be invalid or expired.');
           navigate('/');
@@ -60,7 +61,7 @@ const UpdateBook = () => {
   };
 
   const handleFileChange = (e) => {
-    setProduct({ ...product, images: e.target.files });
+    setProduct({ ...product, images: e.target.files[0] });
 };
 
   const handleSubmit = async (e) => {
@@ -69,23 +70,34 @@ const UpdateBook = () => {
       setErrorMessage('All fields are required!');
       return;
     }
+
+    const updateData = new FormData();
+    updateData.append('name', product.name);  
+    updateData.append('description', product.description);
+    updateData.append('categoryId', product.categoryId);
+    updateData.append('price', product.price);
+    updateData.append('images', product.image); 
+    console.log(updateData)
+
     try {
       const response = await fetch(`http://localhost:5000/api/updateProduct/${id}`, {
         method: 'PUT',
         headers: {
           'Authorization': localStorage.getItem('accessToken'),
-          'Content-Type': 'application/json, multipart/form-data',
+          // 'Content-Type': 'multipart/form-data',
         },
-        body: JSON.stringify(product),
+        body: updateData 
       });
       if (response.ok) {
         console.log('Product updated successfully');
         navigate('/allProducts');
       } else {
         console.error('Failed to update product:', response.statusText);
+        setErrorMessage('Failed to update product. Please try again later');
       }
     } catch (error) {
       console.error('Error updating product:', error);
+      setErrorMessage('An error occurred while updating the product. Please try again later');
     }
   };
 
@@ -126,8 +138,8 @@ const UpdateBook = () => {
           </div>
 
           <div className="mb-3">
-            <label htmlFor="image" className="form-label">Image</label>
-            <input type="file" className="form-control" id="image" name="image" onChange={handleFileChange} />
+            <label htmlFor="images" className="form-label">Image</label>
+            <input type="file" className="form-control" id="images" name="images" onChange={handleFileChange} />
           </div>
           <button type="submit" className="btn btn-primary">Update Product</button>
           <button type="submit" className="btn btn-primary mx-5" onClick={handleShowAllBook}>Show All Books</button>

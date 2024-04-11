@@ -15,7 +15,8 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('dev'))
 app.use(cors());
-app.use(fileUpload());
+app.use(fileUpload()); 
+
 app.use("/public/assets", express.static(__dirname + '/public/assets'));
 
 

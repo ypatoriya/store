@@ -14,8 +14,7 @@ const createProduct = async (req, res) => {
     const { name, description, categoryId, price } = req.body;
     const images = req.files ? Array.from(Object.values(req.files).flat()) : [];
     const createdBy = req.user.id
-    console.log(images)
-    
+
     const dirExists = fs.existsSync(`public/assets/`);
     if (!dirExists) {
       fs.mkdirSync(`public/assets/`, { recursive: true });
@@ -124,10 +123,8 @@ const updateProduct = async (req, res) => {
       fs.mkdirSync(`public/assets/`, { recursive: true });
     }
 
-    // Array to store paths of uploaded images
     let imagePaths = [];
 
-    // Upload each image and store its path
     for (const image of images) {
       if (!image || !image.name) {
         throw new Error("Image or image name is undefined");
@@ -148,7 +145,6 @@ const updateProduct = async (req, res) => {
       });
     }
 
-    // Update product with new data including images
     await sequelize.query(
       'UPDATE product SET name = ?, description = ?, categoryId = ?, price = ?, images = ? WHERE id = ?',
       { replacements: [name, description, categoryId, price, imagePaths.join(','), productId] }
@@ -161,18 +157,36 @@ const updateProduct = async (req, res) => {
   }
 };
 
-
-
 // delete a product
 const deleteProduct = async (req, res) => {
   try {
-    const productId = req.params.id;
 
-    await sequelize.query(
-      'DELETE FROM product WHERE id = ?',
-      { replacements: [productId], type: QueryTypes.DELETE }
+    const productId = req.params.id;
+    const userId = req.user.id;
+
+      const product = await sequelize.query(
+      `SELECT * FROM product WHERE id = :productId AND createdBy = :userId`,
+      {
+        replacements: { productId, userId },
+        type: sequelize.QueryTypes.SELECT,
+      }
     );
-    res.json({ message: 'Product deleted successfully' });
+ 
+    if (product.length === 0) {
+      return res.status(404).json({ message: "product not found!" });
+    }
+ 
+    if (product[0].createdBy !== userId) {
+      return res.status(403).json({ message: "Not Authorized" });
+    }
+ 
+    await sequelize.query(
+      `DELETE FROM product WHERE id = :productId`,
+      {
+        replacements: { productId },
+        type: sequelize.QueryTypes.DELETE,
+      }
+    );
   } catch (error) {
     console.error('Error deleting product:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -199,7 +213,7 @@ const searchProducts = async (req, res) => {
          OR CAST(p.categoryId AS CHAR) LIKE :query
          OR CAST(p.price AS CHAR) LIKE :query`,
       {
-        replacements: { query: `%${name.toLowerCase()}%` },
+        replacements: { query: `%${name.toLowerCase()}%` }, 
         type: QueryTypes.SELECT,
       }
     );
