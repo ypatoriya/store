@@ -1,13 +1,34 @@
-const cron = require("node-cron");
-const express = require("express");
+let nodemailer = require("nodemailer");
 
-const app = express();
-
-cron.schedule("*/5 * * * * *", function () {
-  console.log("---------------------");
-  console.log("running a task every 5 seconds");
+let sender = nodemailer.createTransport({
+	service: 'gmail',
+	auth: {
+    user: 'ypatoriya.netclues@gmail.com',
+		pass: 'tspy dwni dqmm kibp'
+	}
 });
 
-app.listen(5000, () => {
-  console.log("application listening.....");
+let mail = {
+	from: 'ypatoriya.netclues@gmail.com',
+	to:
+    'yagupatel2009@gmail.com',
+	subject: 'Sending Email using Node.js',
+  text: ' Hey there!',
+	html:
+    '<h1>Mail</h1>',
+attachments: [
+	{
+		filename: 'name.txt',
+    filepath: process.cwd() + '/name.txt'
+	}
+]
+};
+
+sender.sendMail(mail, function (error, info) {
+	if (error) {
+		console.log(error);
+	} else {
+		console.log('Email sent successfully: '
+			+ info.response);
+	}
 });
