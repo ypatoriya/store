@@ -90,6 +90,10 @@ const ProductTable = () => {
 
     }
 
+    const handleMail = () => {
+        navigate('/email');
+    }
+
     const handleDelete = (id) => {
         const isConfirmed = window.confirm('Are you sure you want to delete this product?');
     
@@ -131,7 +135,6 @@ const ProductTable = () => {
 
 
     useEffect(() => {
-
 
         const fetchProducts = async () => {
             try {
@@ -265,6 +268,7 @@ const ProductTable = () => {
                         <button className="btn btn-primary btn-sm mx-5" type="button" onClick={handleNextPage} disabled={products.length < pageSize}>Next Page</button>
                 </div>
                 <button className="btn btn-primary btn-sm" type="button" onClick={handleClick}>Add Product</button>
+                <button className="btn btn-primary btn-sm" type="button" onClick={handleMail}>Send Mail</button>
                 <button className="btn btn-secondary btn-sm" type="button" onClick={handleCategory}>Category</button>
            </div>
         </div>

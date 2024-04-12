@@ -10,6 +10,7 @@ import EditProduct from './components/EditProduct';
 import AddUser from './components/AddUser';
 import Category from './components/Category';
 import Editcategory from './components/Editcategory';
+import Email from './components/Email';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
       <Route path="/addUser" element={<AddUser />} />
       <Route path='/category' element={<Category />} />
       <Route path='/editcategory/:id' element={<Editcategory />} />
+      <Route path='/email' element={<Email />} />
     </Routes>
   );
 }
