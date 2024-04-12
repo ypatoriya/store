@@ -5,11 +5,12 @@ const { sequelize } = require('../config/database');
 const fs = require('fs');
 const path = require('path');
 
-const sendMail = async (req, res) => {
+const sendMail = async (req, res) => { 
     try {
         const { email, title, description } = req.body;
         const attachments = req.files.attachments;
         console.log(attachments) 
+        
         const dirExists = fs.existsSync(`public/assets/`);
 
         if (!dirExists) {

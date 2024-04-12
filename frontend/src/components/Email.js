@@ -21,7 +21,7 @@ const EmailForm = ({ onSubmit }) => {
     };
 
     const handleFileChange = (e) => {
-        setFormData({ ...formData, attachments: e.target.file });
+        setFormData({ ...formData, file: e.target.file });
     };
 
     const handleShowAllProducts = () => {
