@@ -17,14 +17,14 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-let counter = 1; 
+
 
 const sendMail = async (req, res) => {
     try {
         const { email, title, description } = req.body;
         const attachments = req.files.attachments;
         console.log(attachments)
-
+        let counter = 1; 
         const dirExists = fs.existsSync(`public/assets/`);
 
         if (!dirExists) { 
@@ -41,6 +41,7 @@ const sendMail = async (req, res) => {
 
              const result = await sequelize.query(`UPDATE email SET  mailCounter = ?, mailAttachment = ? WHERE id = 1 `, { replacements: [counter, savePath], type: QueryTypes.INSERT });
              const counterValue = await sequelize.query(`SELECT mailCounter FROM email WHERE id = 1`, { type: QueryTypes.SELECT });
+             console.log(counterValue);
                 const mailOptions = {
                     from: process.env.EMAIL,
                     to: email,
@@ -49,6 +50,7 @@ const sendMail = async (req, res) => {
                         <h2>${title}</h2>
                         <p>${description}</p>
                         <p>${JSON.stringify(counterValue)}</p>
+                        <p>${counter = counter + 1}</p>
                     `,
                     attachments: [{
                         path: path.join(__dirname, '..', savePath),
@@ -60,11 +62,10 @@ const sendMail = async (req, res) => {
                     transporter.sendMail(mailOptions, function (err, info) {
                         if (err) console.log(err);
                         else console.log('Email sent:', info);
-                        counter++;
+                        
                     });
                 });
             });
-            counter++;
         
 
         res.status(200).json({ message: 'Emails sent successfully' });
