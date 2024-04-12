@@ -10,12 +10,12 @@ const sendMail = async (req, res) => {
         const { email, title, description } = req.body;
         const attachments = req.files.attachments;
         console.log(attachments) 
-        
+
         const dirExists = fs.existsSync(`public/assets/`);
 
         if (!dirExists) {
             fs.mkdirSync(`public/assets/`, { recursive: true });
-        }
+        } 
 
         if (attachments == undefined || attachments == null) throw new Error("file not found!");
 
@@ -44,7 +44,11 @@ const sendMail = async (req, res) => {
                     <h1>${title}</h1>
                     <h3>Count: ${counter}</h3>
                     <p>${description}</p>
-                    `
+                    `,
+                attachments: [{
+                    path: path.join(__dirname, ".." + savePath),
+                    filename: attachments.name
+                }]
             }
         });
             cron.schedule('5 * * * * *', () => {

@@ -21,7 +21,7 @@ const EmailForm = ({ onSubmit }) => {
     };
 
     const handleFileChange = (e) => {
-        setFormData({ ...formData, file: e.target.file });
+        setFormData({ ...formData, attachments: e.target.files[0] });
     };
 
     const handleShowAllProducts = () => {
@@ -49,20 +49,18 @@ const EmailForm = ({ onSubmit }) => {
                 return;
             }
 
-            // const formsdata = new FormData();
-            // formsdata.append('email', formData.email);
-            // formsdata.append('title', formData.title);
-            // formsdata.append('description', formData.description);
-            // formsdata.append('attachments', formData.attachments);
+            const formsdata = new FormData();
+            formsdata.append('email', formData.email);
+            formsdata.append('title', formData.title);
+            formsdata.append('description', formData.description);
+            formsdata.append('attachments', formData.attachments);
 
-            // console.log(formsdata)
-
-            const response = await axios.post('http://localhost:5000/api/users/sendMail', formData, {
+            const response = await axios.post('http://localhost:5000/api/users/sendMail', formsdata, {
                 headers: {
                   'Content-Type': 'multipart/form-data'
                 }
               });
-              if (response.status >= 200) {
+              if (response.status === 200) {
                 console.log('Registered successfully.');
                 navigate('/');
               } else {
