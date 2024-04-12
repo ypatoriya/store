@@ -5,8 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const ProductForm = ({ onSubmit }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [formData, setFormData] = useState({
-        name: '',
-      createdBy:''
+        categoryName: '',
     });
 
     const navigate = useNavigate();
@@ -15,29 +14,33 @@ const ProductForm = ({ onSubmit }) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleFileChange = (e) => {
-        setFormData({ ...formData, images: e.target.files[0] });
-    };
-
     const handleShowAllProducts = () => {
-        navigate('/allProducts');
+        navigate('/category');
     }
 
     const handleCancel = () => {
-        navigate('/allProducts');
+        navigate('/category');
     }
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!formData.name || !formData.createdBy) {
+
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            console.log('No token found. User is not authenticated.');
+            navigate('/');
+            return;
+        }
+
+        if (!formData.categoryName) {
             setErrorMessage('All fields are required!');
             return;
         }
-        const { name, createdBy } = formData;
 
         const xhr = new XMLHttpRequest();
         xhr.open('POST', 'http://localhost:5000/api/createCategory', true);
         xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('Authorization', token);
         xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
@@ -49,13 +52,9 @@ const ProductForm = ({ onSubmit }) => {
                 }
             }
         };
-        xhr.send(
-            JSON.stringify({
-                categoryname: name,
-                createdBy
-            })
-        );
-        navigate('/allProducts');
+        xhr.send(JSON.stringify(formData));
+        console.log(formData);
+        navigate('/category');
     };
 
     return (
@@ -66,12 +65,8 @@ const ProductForm = ({ onSubmit }) => {
                     {errorMessage && <div className="alert alert-danger mt-3">{errorMessage}</div>}
                     <div>
                         <div className="form-group mx-3 mt-3">
-                            <label htmlFor="name">Name</label>
-                            <input type="text" className="form-control" id="name" name="name" value={formData.name} onChange={handleChange} />
-                        </div>
-                        <div className="form-group mx-3 mt-3">
-                            <label htmlFor="createdBy">Created By</label>
-                            <input type="text" className="form-control" id="createdBy" name="createdBy" value={formData.description} onChange={handleChange} />
+                            <label htmlFor="categoryName">Category Name</label>
+                            <input type="text" className="form-control" id="categoryName" name="categoryName" value={formData.categoryName} onChange={handleChange} />
                         </div>
                     </div>
                 </Col>

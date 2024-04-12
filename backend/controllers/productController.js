@@ -65,7 +65,8 @@ const getAllProducts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
     const offset = (page - 1) * pageSize;
-
+    const userId = req.user.id;
+    
     const products = await sequelize.query(
       `SELECT
       p.id,
@@ -204,11 +205,12 @@ const searchProducts = async (req, res) => {
     }
 
     const products = await sequelize.query(
-      `SELECT p.*, c.categoryName AS categoryName
+      `SELECT p.*, c.categoryName AS category_name
        FROM product p
        LEFT JOIN category c ON p.categoryId = c.id
        WHERE LOWER(p.name) LIKE :query
          OR LOWER(p.description) LIKE :query
+         OR LOWER(c.categoryName) LIKE :query
          OR CAST(p.categoryId AS CHAR) LIKE :query
          OR CAST(p.price AS CHAR) LIKE :query`,
       {

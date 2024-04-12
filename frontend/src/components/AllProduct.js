@@ -29,7 +29,7 @@ const ProductTable = () => {
 
             if (query === "") {
                 // Load all products if no search query
-                const response = await fetch('http://localhost:5000/api/products', {
+                const response = await fetch(`http://localhost:5000/api/products?page=${page}&pageSize=${pageSize}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': token
@@ -41,7 +41,7 @@ const ProductTable = () => {
                 } else {
                     console.error('Request failed. Status:', response.status);
                 }
-            } else {
+            } else { 
                 // Load filtered products if there's a search query
                 const response = await fetch(`http://localhost:5000/api/search?name=${query}`, {
                     method: 'GET',
@@ -120,7 +120,7 @@ const ProductTable = () => {
                 // Set the deleted product's ID
                 setDeletedProductId(id);
             } else {
-                setErrorMessage("Failed to delete product.");
+                setErrorMessage("You are not authorized to delete this product. Failed to delete product.");
                 console.error('Failed to delete product. Status:', response.status);
             }
         } catch (error) {
@@ -142,13 +142,14 @@ const ProductTable = () => {
                     navigate("/")
                 }
                 const xhr = new XMLHttpRequest();
-                xhr.open('GET', 'http://localhost:5000/api/products', true);
+                xhr.open('GET', `http://localhost:5000/api/products?page=${page}&pageSize=${pageSize}`, true);
                 xhr.setRequestHeader('Authorization', token);
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === XMLHttpRequest.DONE) {
                         if (xhr.status === 200) {
                             const response = JSON.parse(xhr.responseText);
                             setProducts(response);
+                            console.log(response);
                         } else {
                             console.error('Error fetching products:', xhr.statusText);
                         }
@@ -181,9 +182,9 @@ const ProductTable = () => {
             }
         };
 
-        fetchUser();
-       fetchProducts();
-    }, [deletedProductId]);
+    fetchUser();
+    fetchProducts();
+    }, [deletedProductId, page, pageSize]);
 
 
     return (

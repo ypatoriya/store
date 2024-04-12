@@ -12,6 +12,35 @@ const CategoryTable = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [query, setQuery] = useState('');
 
+    const handleDelete = async (id) => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                console.log('No token found. User is not authenticated.');
+                navigate('/');
+                return;
+            }
+
+            const response = await axios.delete(`http://localhost:5000/api/deleteCategory/${id}`, {
+                headers: {
+                    'Authorization': token
+                }
+            });
+            if (response.status >= 200) {
+                setCategories(categories.filter(category => category._id !== id));
+                setErrorMessage('Category deleted successfully.');
+                window.location.reload();
+            }
+            else {
+                console.error('Error deleting category:', response.data.message);
+                setErrorMessage('Error deleting category. Please try again later.');
+            }
+        } catch (error) {
+            console.error('Error deleting category:', error);
+            setErrorMessage('Error deleting category. Please try again later.');
+        }
+    }
+
    const handleLogout = () => {
         localStorage.removeItem('accessToken');
         navigate('/');
@@ -64,14 +93,16 @@ const CategoryTable = () => {
 
                     </div>
 
-                    <div class="d-flex right-menu"> <input type="text"
+                    {/* <div class="d-flex right-menu"> <input type="text"
                         className="search-input"
                         placeholder="Search..."
                         value={query}
                         onChange={(e) => setQuery(e.target.value)} />
                         <button className="btn btn-primary btn-sm " type="button" onClick={handleSearch}>Search</button>
-                        <button className="btn btn-warning logout-button " type="button" onClick={handleLogout}>Log Out</button>
-                    </div>
+                        
+                    </div> */}
+
+                    <button className="btn btn-warning logout-button " type="button" onClick={handleLogout}>Log Out</button>
                 </div>
             </nav>
             {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
@@ -81,6 +112,7 @@ const CategoryTable = () => {
                     <tr>
                         <th>Name</th>
                         <th>Created By</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -88,8 +120,10 @@ const CategoryTable = () => {
                         <tr key={category.id}>
                             <td>{category.categoryName}</td>
                             <td>{category.createdBy}</td>
+                            <td><button className="btn btn-primary" onClick={() => navigate(`/editCategory/${category.id}`)}>Edit</button></td>
+                            <td><button className="btn btn-danger" onClick={() => handleDelete(category.id)}>Delete</button></td>
                         </tr>
-                    ))}
+                    ))}     
                 </tbody>
             </table>
             <div className="button-container d-flex justify-content-between" >

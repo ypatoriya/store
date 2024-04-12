@@ -9,13 +9,13 @@ const path = require('path');
 // Function to create a new category
 const createCategory = async (req, res) => {
   try {
-    const { categoryname } = req.body;
+    const  { categoryName } = req.body;
     const createdBy = req.user.id
 
     const result = await sequelize.query(
-      'INSERT INTO category (categoryname, createdBy) VALUES (?, ?)',
+      'INSERT INTO category (categoryName, createdBy) VALUES (?, ?)',
       {
-        replacements: [categoryname, createdBy],
+        replacements: [categoryName, createdBy],
         type: QueryTypes.INSERT
       }
     );
@@ -60,7 +60,7 @@ const getCategoryById = async (req, res) => {
     const categoryId = req.params.id;
  
     const category = await sequelize.query(
-      'SELECT * FROM categories WHERE id = ?',
+      'SELECT * FROM category WHERE id = ?',
       { replacements: [categoryId], type: QueryTypes.SELECT }
     );
     if (category.length === 0) {
@@ -79,11 +79,12 @@ const updateCategory = async (req, res) => {
   try {
     const categoryId = req.params.id;
 
-    const { categoryname } = req.body;
+    const { categoryName } = req.body;
+    console.log(categoryName)
 
     await sequelize.query(
-      'UPDATE categories SET categoryname = ? WHERE id = ?',
-      { replacements: [categoryname, categoryId], type: QueryTypes.UPDATE }
+      'UPDATE category SET categoryName = ? WHERE id = ?',
+      { replacements: [categoryName, categoryId], type: QueryTypes.UPDATE }
     );
     res.json({ message: 'Category updated successfully' });
   } catch (error) {
@@ -100,6 +101,7 @@ const deleteCategory = async (req, res) => {
 
   const categoryId = req.params.id;
   const createdBy = req.user.id;
+  const userRole  = req.user.userRole
 
   try {
 
@@ -118,7 +120,7 @@ const deleteCategory = async (req, res) => {
     if (category[0].createdBy !== createdBy) {
       return res.status(403).json({ message: "Not Authorized" });
     }
- 
+    
     await sequelize.query(
       `DELETE FROM category WHERE id = :categoryId`,
       {
@@ -126,6 +128,7 @@ const deleteCategory = async (req, res) => {
         type: sequelize.QueryTypes.DELETE,
       }
     );
+
  
     return res.status(200).json({ message: "success" });
   } catch (error) {

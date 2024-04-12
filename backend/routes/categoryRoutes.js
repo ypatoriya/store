@@ -11,12 +11,12 @@ router.post('/createCategory', verifyToken, createCategory);
 router.get('/allCategory',verifyToken, getAllCategories); 
 
 // Update a category
-router.put('/category/:id',verifyToken, updateCategory); 
+router.put('/editCategory/:id',verifyToken, updateCategory); 
 
 // Delete a category
 router.delete('/deleteCategory/:id',verifyToken, deleteCategory);
 
-// Get a specific category by ID
-//router.get('/category/:id', getCategoryById);
+//Get a specific category by ID
+router.get('/categorybyId/:id',verifyToken, getCategoryById);
 
 module.exports = router;
