@@ -7,6 +7,10 @@ const morgan = require('morgan');
 const { sequelize, testConnection } = require('./config/database');
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
+const cron = require('node-cron');
+const { sendCounterMail } = require('./controllers/cronController');
+
+cron.schedule("*/10 * * * * *", sendCounterMail);
 
 const app = express();
 const PORT = process.env.PORT || 5000;

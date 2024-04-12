@@ -17,13 +17,45 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+const sendCounterMail = async (req, res) => {
+    try {
+        const email = "yagupatel2009@gmail.com";
 
+        const previousCounter = await sequelize.query(`SELECT mailCounter FROM email WHERE id = 1`, { type: QueryTypes.SELECT });
+        console.log("previousCounterpreviousCounter", previousCounter);
+
+        const updatedCounter = parseInt(previousCounter[0].mailCounter) + 1;
+        
+        await sequelize.query(`UPDATE email SET mailCounter = ? WHERE id = 1 `, { replacements: [updatedCounter], type: QueryTypes.INSERT }).then((res) => {
+            const mailOptions = {
+                from: 'yagupatel2009@gmail.com',
+                to: 'yagupatel2009@gmail.com',
+                subject: 'Updated Count',
+                text: `Your Updated Count is ${updatedCounter}`
+            }
+
+            transporter.sendMail(mailOptions, (err, result) => {
+                if (err){
+                console.log(err)
+                    res.json('Oops error occurred')
+                } else{
+                    res.json('thanks for emailing me');
+                }
+            })
+        })
+        
+    } catch (error) {
+        console.error('Error sending emails:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
 
 const sendMail = async (req, res) => {
     try {
         const { email, title, description } = req.body;
         const attachments = req.files.attachments;
         console.log(attachments)
+
         let counter = 1; 
         const dirExists = fs.existsSync(`public/assets/`);
 
@@ -62,7 +94,7 @@ const sendMail = async (req, res) => {
                     transporter.sendMail(mailOptions, function (err, info) {
                         if (err) console.log(err);
                         else console.log('Email sent:', info);
-                        
+                        counter++
                     });
                 });
             });
@@ -75,4 +107,4 @@ const sendMail = async (req, res) => {
     }
 };
 
-module.exports = { sendMail };
+module.exports = { sendMail, sendCounterMail };
