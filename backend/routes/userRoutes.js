@@ -5,7 +5,7 @@ const { registerUser, loginUser, getUserProfile, getImage } = require('../contro
 const { verifyToken } = require('../middlewares/authMiddleware');
 
 const {sendMail} = require('../controllers/cronController')
-
+ 
 // Register a new user
 router.post('/users/register', registerUser);
 

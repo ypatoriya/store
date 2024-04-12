@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import './component.css';
+import axios from 'axios';
 
 const EmailForm = ({ onSubmit }) => {
     const [errorMessage, setErrorMessage] = useState('');
@@ -20,7 +21,7 @@ const EmailForm = ({ onSubmit }) => {
     };
 
     const handleFileChange = (e) => {
-        setFormData({ ...formData, files: e.target.files[0] });
+        setFormData({ ...formData, files: e.target.file });
     };
 
     const handleShowAllProducts = () => {
@@ -31,7 +32,7 @@ const EmailForm = ({ onSubmit }) => {
         navigate('/allProducts');
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
 
         e.preventDefault();
         try {
@@ -48,34 +49,28 @@ const EmailForm = ({ onSubmit }) => {
                 return;
             }
 
-            const formsdata = new FormData();
-            formsdata.append('email', formData.email);
-            formsdata.append('title', formData.title);
-            formsdata.append('description', formData.description);
-            formsdata.append('attachments', formData.attachments);
+            // const formsdata = new FormData();
+            // formsdata.append('email', formData.email);
+            // formsdata.append('title', formData.title);
+            // formsdata.append('description', formData.description);
+            // formsdata.append('attachments', formData.attachments);
 
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'http://localhost:5000/api/users/sendMail', true);
-            xhr.setRequestHeader('Authorization', token);
-            //xhr.setRequestHeader('Content-Type', 'multipart/form-data');
-            xhr.send(
-                formsdata
-            );
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                    if (xhr.status === 200) {
-                        console.log('Mail Sent successfully');
-                        navigate('/allProducts');
-                    } else {
-                        console.error('Error creating product:', xhr.responseText);
-                    }
+            // console.log(formsdata)
+
+            const response = await axios.post('http://localhost:5000/api/users/sendMail', formData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data'
                 }
-            };
-
-        } catch (error) {
-            console.error('Error creating product:', error);
-            setErrorMessage('Error creating product. Please try again.');
-        }
+              });
+              if (response.status >= 200) {
+                console.log('Registered successfully.');
+                navigate('/');
+              } else {
+                console.log(`Unexpected status code: ${response.status}`);
+              }
+            } catch (error) {
+              console.error('Error registering user:', error.message || JSON.stringify(error));
+            }
     };
 
     return (
