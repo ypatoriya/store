@@ -28,7 +28,7 @@ const sendCounterMail = async (req, res) => {
         
         await sequelize.query(`UPDATE email SET mailCounter = ? WHERE id = 1 `, { replacements: [updatedCounter], type: QueryTypes.INSERT }).then((res) => {
             const mailOptions = {
-                from: 'yagupatel2009@gmail.com',
+                from: process.env.EMAIL,
                 to: 'yagupatel2009@gmail.com',
                 subject: 'Updated Count',
                 text: `Your Updated Count is ${updatedCounter}`
