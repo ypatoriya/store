@@ -2,9 +2,28 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
-
+import yup from "yup";
+import { useForm } from 'react-hook-form'
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Container, Form, Button, Alert } from 'react-bootstrap';
+import { MDBRadio } from 'mdb-react-ui-kit';
 
 const AddBook = () => {
+
+  // const schema  = Yup.object().shape({
+  //   firstName: Yup.string().required().min(3, "3 chars"),
+  //   email: Yup.string().email().required(),
+  //   password: Yup.string().required().min(8)
+  // })
+
+  // const {
+  //   register,
+  //   handleSubmit,
+  //   formState: {errors},
+  // } = useForm({
+  //   resolver: yupResolver(schema),
+  // });
+
   const [errorMessage, setErrorMessage] = useState()
   const [formData, setFormData] = useState({
     firstName: '',
@@ -13,6 +32,8 @@ const AddBook = () => {
     confirmPassword: '',
     profile_pic: null,
   });
+
+
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -28,13 +49,16 @@ const AddBook = () => {
     navigate('/')
   }
 
-  const handleSubmit = async (event) => {
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
+
+    
 
     if (!formData.firstName || !formData.email || !formData.password || !formData.confirmPassword) {
       setErrorMessage('All fields are required!');
       return;
     }
+
 
     const { password, confirmPassword } = formData;
     if (password !== confirmPassword) {
@@ -76,38 +100,51 @@ const AddBook = () => {
       <div className="row justify-content-center">
         <div className="col-md-6">
           <h2>Sign Up</h2>
+
           {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label htmlFor="firstName" className="form-label">First Name</label>
-              <input type="text" required className="form-control" id="firstName" name="firstName" value={formData.firstName} onChange={handleInputChange} />
+          <form onSubmit={handleFormSubmit}>
+
+            <div className="mb-3 mt-5">
+             
+              <input type="text" required className="form-control" placeholder='First Name' id="firstName" name="firstName" value={formData.firstName} onChange={handleInputChange} />
+
             </div>
+
             <div className="mb-3">
-              <label htmlFor="lastName" className="form-label">Last Name</label>
-              <input type="text" required className="form-control" id="lastName" name="lastName" value={formData.lastName} onChange={handleInputChange} />
+            
+              <input type="text" required className="form-control" placeholder='Last Name' id="lastName" name="lastName" value={formData.lastName} onChange={handleInputChange} />
             </div>
+
             <div className="mb-3">
-              <label htmlFor="email" className="form-label">Email</label>
-              <input type="email" required className="form-control" id="email" name="email" value={formData.email} onChange={handleInputChange} />
+          
+              <input type="email" required className="form-control" placeholder='Email' id="email" name="email" value={formData.email} onChange={handleInputChange} />
             </div>
+
             <div className="mb-3">
-              <label htmlFor="password" className="form-label">Password</label>
-              <input type="password" required className="form-control" id="password" name="password" value={formData.password} onChange={handleInputChange} />
+            
+              <input type="password" required className="form-control" placeholder='Password' id="password" name="password" value={formData.password} onChange={handleInputChange} />
             </div>
+
             <div className="mb-3">
-              <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
-              <input type="password" required className="form-control" id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} />
+         
+              <input type="password" required className="form-control" placeholder='Confirm Password' id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} />
             </div>
+
             <div className="mb-3">
-              <label htmlFor="gender" className="form-label">Gender</label>
-              <input type="text" required className="form-control" id="gender" name="gender" value={formData.gender} onChange={handleInputChange} />
+            <label className='mb-3'>Gender</label> <br></br>
+            <MDBRadio name='gender' id='gender' value='Male' label='Male' onChange={handleInputChange} inline />
+            <MDBRadio name='gender' id='gender' value='Female' label='Female' onChange={handleInputChange} inline />
             </div>
+
+
             <div className="mb-3">
-              <label htmlFor="hobbies" className="form-label">Hobbies</label>
-              <input type="text" required className="form-control" id="hobbies" name="hobbies" value={formData.hobbies} onChange={handleInputChange} />
+           
+              <input type="text" required className="form-control" placeholder='Hobbies' id="hobbies" name="hobbies" value={formData.hobbies} onChange={handleInputChange} />
             </div>
+
             <div className='mb-3'>
-              <label htmlFor="profile_pic" className="form-label">profile_pic</label>
+
+              <label>Profile Picture</label>
               <input type="file" className="form-control" id="profile_pic" name="profile_pic" onChange={handleFileChange} />
             </div>
 
@@ -123,7 +160,7 @@ const AddBook = () => {
               <button
                 className="btn btn-primary btn-sm mx-1 Register"
                 type="button"
-                onClick={handleSubmit}
+                onClick={handleFormSubmit}
               >
                 Register
               </button>

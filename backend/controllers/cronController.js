@@ -81,7 +81,6 @@ const sendMail = async (req, res) => {
                     html: `
                         <h2>${title}</h2>
                         <p>${description}</p>
-                        <p>${JSON.stringify(counterValue)}</p>
                         <p>${counter = counter + 1}</p>
                     `,
                     attachments: [{

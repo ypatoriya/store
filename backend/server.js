@@ -10,7 +10,7 @@ const fileUpload = require('express-fileupload');
 const cron = require('node-cron');
 const { sendCounterMail } = require('./controllers/cronController');
 
-cron.schedule("*/10 * * * * *", sendCounterMail);
+//cron.schedule("*/10 * * * * *", sendCounterMail);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -31,7 +31,7 @@ testConnection()
     // Routes
     app.use('/api', userRoutes);
     app.use('/api', categoryRoutes);
-    app.use('/api', productRoutes);
+    app.use('/api', productRoutes); 
 
 
     app.use((err, req, res, next) => {
@@ -39,8 +39,6 @@ testConnection()
       res.status(500).send('Something went wrong!');
     });
 
-    
-    // Start the server
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });

@@ -41,7 +41,7 @@ const ProductTable = () => {
                 } else {
                     console.error('Request failed. Status:', response.status);
                 }
-            } else { 
+            } else {
                 // Load filtered products if there's a search query
                 const response = await fetch(`http://localhost:5000/api/search?name=${query}`, {
                     method: 'GET',
@@ -73,7 +73,7 @@ const ProductTable = () => {
         }
     };
 
-    const handleCategory= () => {
+    const handleCategory = () => {
         navigate('/category');
     }
 
@@ -96,7 +96,7 @@ const ProductTable = () => {
 
     const handleDelete = (id) => {
         const isConfirmed = window.confirm('Are you sure you want to delete this product?');
-    
+
         if (isConfirmed) {
             deleteProduct(id);
         }
@@ -110,14 +110,14 @@ const ProductTable = () => {
                 navigate('/');
                 return;
             }
-    
+
             const response = await fetch(`http://localhost:5000/api/deleteProducts/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': token,
                 },
             });
-    
+
             if (response.ok) {
                 setErrorMessage('Product deleted successfully');
                 console.log('Product deleted successfully');
@@ -185,8 +185,8 @@ const ProductTable = () => {
             }
         };
 
-    fetchUser();
-    fetchProducts();
+        fetchUser();
+        fetchProducts();
     }, [deletedProductId, page, pageSize]);
 
 
@@ -219,15 +219,14 @@ const ProductTable = () => {
                 </div>
             </nav>
             {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
-            <table className="table table-hover">
+            {/* <table className="table table-hover">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th></th>
                         <th>Name</th>
                         <th>Description</th>
                         <th>Category</th>
                         <th>Price</th>
-                        <th>Images</th>
                         <th>Action</th>
 
                     </tr>
@@ -235,11 +234,6 @@ const ProductTable = () => {
                 <tbody>
                     {Array.isArray(products) && products.map((product, index) => (
                         <tr key={index}>
-                            <td>{product.id}</td>
-                            <td>{product.name}</td>
-                            <td>{product.description}</td>
-                            <td>{product.category_name}</td>
-                            <td>{product.price}</td>
                             <td>
                                 <div>
                                     {product.images && product.images.split(',').map((imagePath, index) => (
@@ -247,30 +241,58 @@ const ProductTable = () => {
                                             key={index}
                                             src={`http://localhost:5000${imagePath}`}
                                             alt={`Product ${index}`}
-                                            style={{ width: '50px', height: '50px', margin: '10px' }}
+                                            style={{ width: '100px', height: '100px', margin: '10px' }}
                                         />
                                     ))}
                                 </div>
                             </td>
+                            <td>{product.name}</td>
+                            <td>{product.description}</td>
+                            <td>{product.category_name}</td>
+                            <td>{product.price}</td>
+
                             <td>{<button className="btn btn-primary btn-sm" onClick={() => navigate(`/editProduct/${product.id}`)}>Edit</button>}</td>
                             <td>{<button className="btn btn-danger btn-sm" onClick={() => handleDelete(product.id)}>Delete</button>}</td>
                         </tr>
                     ))}
                 </tbody>
-            </table>
-            
+            </table> */}
 
-           <div className='allproduct-button'>
+
+            <div className='main-card-section'>
+                {Array.isArray(products) && products.map((product, index) => (
+                    <div key={index} className='card'>
+                        <div>
+                            {product.images && product.images.split(',').map((imagePath, index) => (
+                                <img
+                                    key={index}
+                                    src={`http://localhost:5000${imagePath}`}
+                                    alt={`Product ${index}`}
+                                    style={{ width: '100px', height: '100px', margin: '10px' }}
+                                />
+                            ))}
+                        </div>
+                        <div>
+                            <h3>{product.name}</h3>
+                            <p>{product.description}</p>
+                            <h3><b>{product.price}</b></h3>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+
+            <div className='allproduct-button'>
                 <div>
-                        <button className="btn btn-primary btn-sm mx-5" type="button" onClick={handlePreviousPage} disabled={page === 1}>Previous Page</button>
-                        <span className="mx-2">Page {page}</span>
+                    <button className="btn btn-primary btn-sm mx-5" type="button" onClick={handlePreviousPage} disabled={page === 1}>Previous Page</button>
+                    <span className="mx-2">Page {page}</span>
 
-                        <button className="btn btn-primary btn-sm mx-5" type="button" onClick={handleNextPage} disabled={products.length < pageSize}>Next Page</button>
+                    <button className="btn btn-primary btn-sm mx-5" type="button" onClick={handleNextPage} disabled={products.length < pageSize}>Next Page</button>
                 </div>
                 <button className="btn btn-primary btn-sm" type="button" onClick={handleClick}>Add Product</button>
                 <button className="btn btn-primary btn-sm" type="button" onClick={handleMail}>Send Mail</button>
                 <button className="btn btn-secondary btn-sm" type="button" onClick={handleCategory}>Category</button>
-           </div>
+            </div>
         </div>
     );
 };
